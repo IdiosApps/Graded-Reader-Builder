@@ -8,20 +8,11 @@ import java.util.ArrayList
 
 /**
  * Created by james-clark-5 (Idios) on 12/06/17.
- *
+ * Graded-Reader-Builder
  * Description:
  */
 
-
-
-// TODO  - use hashing to speed up searches
-
-// TODO - improve wordTypeSolver - here are some ideas:
-// TODO  - try using markup rules e.g. (v/n + n -> v + n), see how accuracy is
-// should extract adjective information (incase someone writes e.g. "buy a fast cart")
-// "the", "a", "some" will be followed by a noun
-// if first character of substring is a captial, assume the word is proper noun (name!) @markup@
-// TODO - markup time (weekdays, am,pm,....)
+// TODO clear up this code (from synple-todo repo) to just keep relevant parts
 
 
 fun main(args: Array<String>) {
