@@ -14,6 +14,69 @@ import java.util.ArrayList
 
 // TODO clear up this code (from synple-todo repo) to just keep relevant parts
 
+// PSEUDOCODE / PLANS
+// % header
+// copy latex from start of template up to "% Title Page"
+// % title page
+// grab "title" (\title{James' Chinese Graded Reader LaTeX Template}) and
+// "author" (\author{Idios/JC}) from user input distinct from body of text, replace these lines with these strings
+// % table of contents
+// todo add table of contents to template, so code can be used to "fill it out"
+// % Character page, get info from ArrayLists<String> for: names, for pinyin, for description
+//\uline{name1} (\pinyin{li3shan1guai1}) description!
+//
+//\uline{name2} (\pinyin{da4wei2}) description!
+//
+//\uline{name3} (\pinyin{hong2yu4}) description!
+
+// at the main body of text now
+// % chapters
+// have user input "chapter: N" & "chapter name: ...." as that chapter starts
+// get chapter title from arraylist, write a specific {\uline{Chapter title？}}\\} and chapter number w/ this info
+// between "chapter: N" & "chapter: N+1", read lines from user
+// delimit lines, create substring up to next new line
+// place this substring in this style: \indent lorem ipsum："lorem ipsum。lorem ipsum？"
+//                                     \indent lorem ipsum，lorem ipsum\uline{大卫}。
+
+// create a new page if a certain number of characters has been written
+//\clearpage
+
+
+
+
+// add footer keywords to pages
+// get vocab from a ArrayList user input (line delimited)
+// find the first occurence of each word in this list. For the first occurence, add to that page
+
+//\lfoot{
+//    x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\
+//}
+// and rfoot similarly
+
+
+// add figures to tex
+//\begin{figure}[ht!]
+//\centering
+//\includegraphics[width=90mm]{exampleFigure.png}
+//%	\caption{A simple caption \label{overflow}}
+//\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 fun main(args: Array<String>) {
     val dictionaryFile: String = "res/gcide-entries.xml" // http://rali.iro.umontreal.ca/GCIDE/
