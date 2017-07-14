@@ -1,60 +1,22 @@
 import java.io.File
+import java.io.PrintWriter
 import java.util.*
-import java.util.ArrayList
-
-
-
-
 
 /**
  * Created by james-clark-5 (Idios) on 12/06/17.
  * Graded-Reader-Builder
- * Description:
+ * Description: a program to take simple text input and a vocabulary list to produce a graded reader book.
  */
 
-// TODO clear up this code (from synple-todo repo) to just keep relevant parts
-
-// PSEUDOCODE / PLANS
-// % header
-// copy latex from start of template up to "% Title Page"
-// % title page
-// grab "title" (\title{James' Chinese Graded Reader LaTeX Template}) and
-// "author" (\author{Idios/JC}) from user input distinct from body of text, replace these lines with these strings
-// % table of contents
 // todo add table of contents to template, so code can be used to "fill it out"
-// % Character page, get info from ArrayLists<String> for: names, for pinyin, for description
-//\uline{name1} (\pinyin{li3shan1guai1}) description!
 //
-//\uline{name2} (\pinyin{da4wei2}) description!
-//
-//\uline{name3} (\pinyin{hong2yu4}) description!
-
-// at the main body of text now
-// % chapters
-// have user input "chapter: N" & "chapter name: ...." as that chapter starts
-// get chapter title from arraylist, write a specific {\uline{Chapter title？}}\\} and chapter number w/ this info
-// between "chapter: N" & "chapter: N+1", read lines from user
-// delimit lines, create substring up to next new line
-// place this substring in this style: \indent lorem ipsum："lorem ipsum。lorem ipsum？"
-//                                     \indent lorem ipsum，lorem ipsum\uline{大卫}。
-
-// create a new page if a certain number of characters has been written
-//\clearpage
-
-
-
-
-// add footer keywords to pages
-// get vocab from a ArrayList user input (line delimited)
-// find the first occurence of each word in this list. For the first occurence, add to that page
-
 //\lfoot{
 //    x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\
 //}
 // and rfoot similarly
 
-
-// add figures to tex
+// todo: add support for figures
+// add figures to tex (if line.contains(".png"))
 //\begin{figure}[ht!]
 //\centering
 //\includegraphics[width=90mm]{exampleFigure.png}
@@ -62,255 +24,61 @@ import java.util.ArrayList
 //\end{figure}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fun main(args: Array<String>) {
-    val dictionaryFile: String = "res/gcide-entries.xml" // http://rali.iro.umontreal.ca/GCIDE/
-    var unsplitString: String = "The mouse ran up the wall for some wine"
-    var splitStrings: List<String> = unsplitString.split(" ") // split string up
-    var dictMatch: ArrayList<String> = ArrayList<String>() // initialise for storage
-    var ignorableStrings: List<String> = Arrays.asList("The", "A", "And", "Some", "the", "a", "some", "and")
-    var ignoredWordArrayList: ArrayList<String> = ArrayList<String>(Collections.singletonList("ignore")) // for "the", "a", etc.
-    var emptyWordArrayList: ArrayList<String> = ArrayList<String>(Collections.singletonList("")) // for initialisation
-
-  // get wordType for each substring
-
-    // can ignore some words (the, a, some,...)
-
-    // splitStrings.forEachIndexed { index, currentSubString ->
-    // dont add entries, either create them at index or dont
-    for(currentSubString in splitStrings) {
-        if (ignorableStrings.contains(currentSubString)) {
-            splitStringsWordTypes.add(ignoredWordArrayList)
-        }
-        else{
-            splitStringsWordTypes.add(emptyWordArrayList)
-        }
-    }
-
-
-
-
-    // get wordType WITHOUT dictionary (time)
-    // get wordType WITHOUT dictionary (name)
-
-    // get words ready for dictionary checking, then check
-    var substringWordTypesIndex: Int = 0 // keep track of which word has been examined
-        splitStrings.forEachIndexed { index, currentSubString ->
-            println(index)
-            println(splitStringsWordTypes[index])
-            println(ignoredWordArrayList)
-println("which word is being worked on: substringWordTypesIndex" + substringWordTypesIndex)
-            if (splitStringsWordTypes[index] == ignoredWordArrayList){
-                substringWordTypesIndex+=1 // keep track of which words have been worked on
-                // do nothing
-            }
-            if (!(splitStringsWordTypes[index] == ignoredWordArrayList)) { // TODO OR [time] OR [name]
-println("splitStringWordType isn't ignorable/time/person")
-                // capitalise first letter
-                // var currentSubStringCapitalised: String // initalise
-                // prepareSubstring(currentSubString, currentSubStringCapitalised)
-                var currentSubStringCapitalised: String = currentSubString.substring(0, 1).toUpperCase() + currentSubString.substring(1)
-                // depluralise:
-                if (currentSubStringCapitalised[currentSubStringCapitalised.length - 1] == 's') {
-                    currentSubStringCapitalised = currentSubStringCapitalised.substring(0, currentSubStringCapitalised.length - 1)
-                }
-
-                // get wordType from dictionary
-                findWordInDictionary(dictionaryFile, currentSubStringCapitalised, dictMatch)
-                getWordType(dictMatch, currentSubString, ignoredWordArrayList,substringWordTypesIndex) // don't pass in capitalised substring
-                substringWordTypesIndex +=1 // keep track of which words have been worked on
-            }
-        }
-
-
-
-    println(unsplitString)
-    wordTypeSolver(splitStringsWordTypes)
-
-
-    //markupWord(splitStringsWordTypes,splitStrings)
+    val inputStoryFilename: String = "res/inputStory"
+    val inputVocabFilename: String = "res/inputVocab"
+    val inputHeaderFilename: String = "res/inputHeader"
+    val outputStoryFilename: String = "res/inputVocab"
+    writeTexHeader(outputStoryFilename, inputHeaderFilename)
+    writeTexStory(outputStoryFilename, inputStoryFilename)
+    // addVocabFooters()
 }
 
-object splitStringsWordTypes : ArrayList<ArrayList<String>>() {
-}
+fun writeTexHeader(outputStoryFilename: String, inputHeaderFilename: String){
+    val writer = PrintWriter(outputStoryFilename, "UTF-8") // create writer for output
+    val inputHeaderFile: File = File(inputHeaderFilename) // get file ready
+    val scan: Scanner = Scanner(inputHeaderFile)
 
-object tempSplitStringsWordTypes : ArrayList<ArrayList<String>>() {
-}
-
-fun wordTypeSolver(splitStringsWordTypes : ArrayList<ArrayList<String>>){
-    var prepArray: ArrayList<String> = ArrayList<String>(); prepArray.add("prep.")
-    var nounArray: ArrayList<String> = ArrayList<String>(); nounArray.add("n.")
-    var verbArray: ArrayList<String> = ArrayList<String>(); verbArray.add("v.")
-    var alreadyVerb: Boolean = false
-
-    splitStringsWordTypes.forEachIndexed { index, currentSubStringType ->
-
-        // use prep. information first
-        // assume possible prep. is definitely prep.
-        // assume prep. is followed by noun
-        // note: sentence could be "need to purchase food"; this algorithm would give [v.],[prep.],[n.],[n.]
-        // however, the user should use be concise and say "purchase food"
-        // this algorithm should be safe in that case, and applies well to e.g. "take cake to party"
-        // TODO - should run this prep. part over all words, and THEN handle the less definite stuff
-        if (splitStringsWordTypes[index].contains("prep.")){
-            // only keep the prep. part
-            splitStringsWordTypes[index] = prepArray
-            // next n. is definitely n.
-            if (splitStringsWordTypes[index+1].contains("n.")){ // TODO convert this to a loop, just in case!
-                splitStringsWordTypes[index+1] = nounArray
-            }
-            else if (splitStringsWordTypes[index+2].contains("n.")){
-                splitStringsWordTypes[index+2] = nounArray
-            }
-        }
-        // assume that v. comes first
-        // TODO make some less janky code/logic
-        if (splitStringsWordTypes[index].contains("v.") && alreadyVerb == false){ //strange logic, needs ironing out
-            splitStringsWordTypes[index] = verbArray
-            alreadyVerb = true
-        }
-        // assume that any leftovers are nouns
-        if (splitStringsWordTypes[index].contains("n.")){
-            splitStringsWordTypes[index] = nounArray
-            alreadyVerb = true
-        }
-        // n.b. some of this algorithm is redundant under the assumption that verb comes first
-    }
-    println(splitStringsWordTypes)
-}
-
-fun findWordInDictionary(fileName: String, inputWord: String, dictMatch: ArrayList<String>){
-    val file: File = File(fileName) // get file ready
-    val scan: Scanner = Scanner(file)
-    val stringToFind: String = "<entry key=\"" + inputWord + "\">"
-    val terminationString: String = "</entry>"
-    var saveLinesBoolean: Boolean = false
-    var vmorphBoolean: Boolean = false
-    dictMatch.clear() // TODO tidy this up; can probably use String instead of ArrayList<String> (having the lines in in an array isn't important)
-
-//    println("create ArrayList starting with string: " + stringToFind)
-
-// find match in dictionary
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines
-        if (line.contains(stringToFind)) {              // found a matching dictionary entry for String
-            saveLinesBoolean = true
-        }
-        if (line.contains(terminationString) && saveLinesBoolean == true) { // found ending string
-            saveLinesBoolean = false
-        }
-
-        // don't use vmorph information (this is for modified versions of the base word, which we don't need)
-        if (line.contains("<vmorph>") && saveLinesBoolean == true) { //
-            vmorphBoolean = false
-        }
-        if (line.contains("</vmorph>")) {              // found a matching dictionary entry for String
-            vmorphBoolean = true
-        }
-
-        // read lines and save to variable, until </entry> is met
-        if (saveLinesBoolean==true && vmorphBoolean==true)
-            dictMatch.add(line)
-        }
+            writer.println(line)  // write all header lines to output file
+    }
     scan.close()
-println("dictMatch is:" + dictMatch)
+    writer.close()
 }
 
-fun getWordType(dictMatch:ArrayList<String>, inputWord: String, ignoredWordArrayList: ArrayList<String>, substringWordTypesIndex: Int) {
-    // TODO keep track of which substring is being worked on :
-    // if splitStringsWordTypes[index] == "
+fun writeTexStory(outputStoryFilename: String, inputStoryFilename: String){
+    val writer = PrintWriter(outputStoryFilename, "UTF-8") // create writer for output
+    val inputHeaderFile: File = File(inputStoryFilename) // get file ready
+    val scan: Scanner = Scanner(inputHeaderFile)
 
-
-
-    var dictMatchString: String = dictMatch.toString()
-    var allCurrentWordTypes: ArrayList<String> = ArrayList<String>()
-
-    while (dictMatchString.contains("<pos>")) {
-        // look to see if there is (still) a wordType
-        val typeStartPos: Int = dictMatchString.indexOf("<pos>")
-        val typeEndPos: Int = dictMatchString.indexOf("</pos")
-        val wordType: String = dictMatchString.substring(typeStartPos + 5, typeEndPos) // get word type
-
-        var dictMatchStringSize: Int = dictMatchString.length // cant get this below, due to shortening of string
-        dictMatchString = dictMatchString.substring(0, typeStartPos) + dictMatchString.substring(typeEndPos + 6, dictMatchStringSize);
-
-        if (wordType.contains("n.") && !allCurrentWordTypes.contains("n.")) {
-            allCurrentWordTypes.add("n.")
+    while(scan.hasNextLine()) {
+        val line: String = scan.nextLine() // read all lines
+        if (line.contains("chapter)")) {   // if a line is has chapter info, do this
+            var chapterString: String = line.substring(7, line.length)  //    substring of line -"chapter"
+            writer.println("\\setstretch{1.5}")
+            writer.println("{\\centering \\LARGE")
+            writer.println("{Chapter N}\\\\") // TODO get chapter number
+            writer.println("{\\uline{"+ chapterString + "}}\\\\}")
         }
+        else {     // else (for now) assume we have ordinary text
 
-        if (wordType.contains("v.") && !allCurrentWordTypes.contains("v.")) { // doesnt seem to be working
-            allCurrentWordTypes.add("v.")
-        }
-
-        if (wordType.contains("prep.") && !allCurrentWordTypes.contains("prep.")) {
-            allCurrentWordTypes.add("prep.")
+        writer.println(line)
+        // todo: create a new page if a certain number of characters has been written by using \clearpage
         }
     }
-    tempSplitStringsWordTypes.add(allCurrentWordTypes) // add these to the global arrray of word types
-    //dictMatchString no longer contains <pos>
-    println("allCurrentWordTypes" + allCurrentWordTypes)
-    println("tempSplitStringsWordTypes" + tempSplitStringsWordTypes)
-    println("adding entry to splitStringsWordTypes!")
-
-                // @PESUDOCODE@ ADD tempSplitStringsWordTypes TO splitStringsWordTypes, IF splitStringsWordTypes[INDEX]!=ignore
-    if(splitStringsWordTypes[substringWordTypesIndex]==ignoredWordArrayList) {
-    //do nothing...
-    }
-    else {
-        splitStringsWordTypes[substringWordTypesIndex] = allCurrentWordTypes
-        println("splitStringsWordTypes" + splitStringsWordTypes)
-    }
+    scan.close()
+    writer.close()
 }
 
+fun addVocabFooters(){
+    // split the InputVocabFile by lines (->array list) and find first part (by space delimiting) of given array entry
+    // find the first instance of a given word from the vocab list in the output story
+    // for that page, add a footer with the full information of that array entry
 
-fun markupWord(splitStringsWordTypes: ArrayList<ArrayList<String>>, splitStrings: List<String>) {
-    var preVerb: String = "[" ; var postVerb: String = "]"
-    var preNoun: String = "#" ; var postNoun: String = "#"
-    var markedSplitString: String
-    var markedString: String = ""
-    splitStringsWordTypes.forEachIndexed { index, currentSubStringWordType ->
-        //println("$currentSubStringType at $index")
-        if (splitStringsWordTypes[index].contains("v.")) {
-            markedSplitString = splitStrings.get(index)//
-            markedSplitString = preVerb + markedSplitString + postVerb
-        }
-        else if (splitStringsWordTypes[index].contains("n.")) {
-            markedSplitString = splitStrings.get(index)//
-            markedSplitString = preNoun + markedSplitString + postNoun
-        } else { // don't markup
-            markedSplitString = splitStrings.get(index)
-        }
-        markedString = markedString + " " + markedSplitString
-        //outputWord(markedString)
-    }
-    println(markedString)
 }
 
-fun outputWord(markedString: String) {
-//try {
-//    val outputFileName = "output/" + "uniquePinyinIn_" + fileName
-//    val writer = PrintWriter(outputFileName, "UTF-8")
-//    writer.println("Number of unique pinyin:"+uniquePinyinArrayList.size +", Total number of pinyin:" + pinyinArrayList.size)
-//    writer.close()
-    println(markedString)
-//} catch (e: IOException) {
-// do something
+fun addVocabSuperscripts(){
+    // for each entry in the vocab list, go through the outputStoryFile and add superscripts with that entry's index+1
 }
-
-//}
 
