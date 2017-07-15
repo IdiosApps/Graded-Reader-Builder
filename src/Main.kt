@@ -28,27 +28,29 @@ fun main(args: Array<String>) {
     val inputStoryFilename: String = "res/inputStory"
     val inputVocabFilename: String = "res/inputVocab"
     val inputHeaderFilename: String = "res/inputHeader"
-    val outputStoryFilename: String = "res/inputVocab"
-    writeTexHeader(outputStoryFilename, inputHeaderFilename)
-    writeTexStory(outputStoryFilename, inputStoryFilename)
+    val outputStoryFilename: String = "res/outputStory.tex"
+    val outputStoryWriter = PrintWriter(outputStoryFilename, "UTF-8") // create writer for output
+    writeTexHeader(outputStoryWriter, inputHeaderFilename)
+    writeTexStory(outputStoryWriter, inputStoryFilename)
     // addVocabFooters()
+
+    outputStoryWriter.println("\\end{document}") // end the TeX document
+    outputStoryWriter.close()
+
 }
 
-fun writeTexHeader(outputStoryFilename: String, inputHeaderFilename: String){
-    val writer = PrintWriter(outputStoryFilename, "UTF-8") // create writer for output
+fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
     val inputHeaderFile: File = File(inputHeaderFilename) // get file ready
     val scan: Scanner = Scanner(inputHeaderFile)
 
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines
-            writer.println(line)  // write all header lines to output file
+        outputStoryWriter.println(line)  // write all header lines to output file
     }
     scan.close()
-    writer.close()
 }
 
-fun writeTexStory(outputStoryFilename: String, inputStoryFilename: String){
-    val writer = PrintWriter(outputStoryFilename, "UTF-8") // create writer for output
+fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
     val inputHeaderFile: File = File(inputStoryFilename) // get file ready
     val scan: Scanner = Scanner(inputHeaderFile)
 
@@ -56,19 +58,18 @@ fun writeTexStory(outputStoryFilename: String, inputStoryFilename: String){
         val line: String = scan.nextLine() // read all lines
         if (line.contains("chapter)")) {   // if a line is has chapter info, do this
             var chapterString: String = line.substring(7, line.length)  //    substring of line -"chapter"
-            writer.println("\\setstretch{1.5}")
-            writer.println("{\\centering \\LARGE")
-            writer.println("{Chapter N}\\\\") // TODO get chapter number
-            writer.println("{\\uline{"+ chapterString + "}}\\\\}")
+            outputStoryWriter.println("\\setstretch{1.5}")
+            outputStoryWriter.println("{\\centering \\LARGE")
+            outputStoryWriter.println("{Chapter N}\\\\") // TODO get chapter number
+            outputStoryWriter.println("{\\uline{"+ chapterString + "}}\\\\}")
         }
         else {     // else (for now) assume we have ordinary text
 
-        writer.println(line)
+            outputStoryWriter.println(line)
         // todo: create a new page if a certain number of characters has been written by using \clearpage
         }
     }
     scan.close()
-    writer.close()
 }
 
 fun addVocabFooters(){
