@@ -51,13 +51,13 @@ fun main(args: Array<String>) {
     // create output from input files
     writeTexHeader(outputStoryWriter, inputHeaderFilename)
     writeTexStory(outputStoryWriter, inputStoryFilename)
+
     // addVocabFooters()
-
-    outputStoryWriter.println("\\end{document}") // end the TeX document
-    outputStoryWriter.close()
-
     addVocabSubsripts(vocabComponentArray, outputStoryFilename, outputStoryWriter)
 
+    // add vocab page at end
+    outputStoryWriter.println("\\end{document}") // end the TeX document
+    outputStoryWriter.close()
 }
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
@@ -98,7 +98,7 @@ fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputS
 
     // replace vocab words w/ the same words PLUS sub/superscript info
     vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
-        content = content.replace(vocabComponentArray[index][0].toRegex(), vocabComponentArray[index][0] + "\\\\textsubscript{" + (index+1) + "}")
+        content = content.replace(vocabComponentArray[index][0].toRegex(), vocabComponentArray[index][0] + "\\\\textsuperscript{" + (index+1) + "}")
     }
     Files.write(path, content.toByteArray(charset))
 }
