@@ -56,8 +56,81 @@ fun main(args: Array<String>) {
     addVocabSubsripts(vocabComponentArray, outputStoryFilename, outputStoryWriter)
 
     // add vocab page at end
+    writeTexVocab(outputStoryWriter, inputVocabFilename, vocabComponentArray)
+
+    // close writing file
     outputStoryWriter.println("\\end{document}") // end the TeX document
     outputStoryWriter.close()
+}
+
+fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, vocabComponentArray: ArrayList<ArrayList<String>>){
+    val inputVocabFile: File = File(inputVocabFilename) // get file ready
+    val scan: Scanner = Scanner(inputVocabFile)
+    var vocabLineCount: Int = 0
+    var tmpComponentArrayList:ArrayList<String> = ArrayList<String>()
+    while(scan.hasNextLine()) {
+        val line: String = scan.nextLine() // read all lines
+
+
+        // split each entry into 3 components: Chinese, Pinyin, English
+        // get Chinese & Pinyin-English substrings
+        var componentList: List<String> = line.split(" ")
+        var zhPinyinSplitIndex: Int = line.indexOf("|")
+        var chineseSplit: String = line.substring(0, zhPinyinSplitIndex)
+        var pinyinEnglishSubstring: String = line.substring(zhPinyinSplitIndex+1, line.length)
+        // get Pinyin and English substrings
+        var pinyinEnglishSplitIndex: Int = pinyinEnglishSubstring.indexOf("|")
+        var pinyinSplit: String = pinyinEnglishSubstring.substring(0, pinyinEnglishSplitIndex)
+        var englishSplit: String = pinyinEnglishSubstring.substring(pinyinEnglishSplitIndex+1, pinyinEnglishSubstring.length)
+
+        var ArrayListInitialiser: ArrayList<String> = ArrayList<String>(Collections.singletonList(""))
+
+        // store the whole entry (to go directly into the footer)
+        vocabArray.add(chineseSplit + pinyinSplit + ": " + englishSplit)
+
+        // store the individual Chinese and English components
+        vocabComponentArray.add(ArrayListInitialiser)
+        vocabComponentArray[vocabLineCount].add(chineseSplit)
+        vocabComponentArray[vocabLineCount].add(pinyinSplit)
+        vocabComponentArray[vocabLineCount].add(englishSplit)
+        vocabComponentArray[vocabLineCount].remove(vocabComponentArray[vocabLineCount][0]) // "uninitilaise" ArrayList empty entry
+
+        vocabLineCount+=1
+    }
+    scan.close()
+    println("vocabArray: " + vocabArray)
+    println("vocabComponentArray: " + vocabComponentArray)
+}
+
+fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
+    val inputHeaderFile: File = File(inputHeaderFilename) // get file ready
+    val scan: Scanner = Scanner(inputHeaderFile)
+
+    while(scan.hasNextLine()) {
+        val line: String = scan.nextLine() // read all lines
+        outputStoryWriter.println(line)  // write all header lines to output file
+    }
+    scan.close()
+}
+
+fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
+    val inputHeaderFile: File = File(inputStoryFilename) // get file ready
+    val scan: Scanner = Scanner(inputHeaderFile)
+
+    while(scan.hasNextLine()) {
+        val line: String = scan.nextLine() // read all lines
+        if (line.contains("Chapter")) {   // add chapter markup if dealing with a chapter
+            outputStoryWriter.println("\\clearpage")
+            outputStoryWriter.println("{\\centering \\large")
+            outputStoryWriter.println("{\\uline{" + line + "}}\\\\}")
+        }
+        else {     // else (for now) assume we have ordinary text
+
+            outputStoryWriter.println(line)
+        // todo: create a new page if a certain number of characters has been written by using \clearpage
+        }
+    }
+    scan.close()
 }
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
@@ -86,7 +159,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     }
 }
 
-fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
+fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter){
     // open the output file, with header and story
     val outputStoryFile: File = File(outputStoryFilename)
     val scan: Scanner = Scanner(outputStoryFile)
@@ -98,75 +171,22 @@ fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputS
 
     // replace vocab words w/ the same words PLUS sub/superscript info
     vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
-        content = content.replace(vocabComponentArray[index][0].toRegex(), vocabComponentArray[index][0] + "\\\\textsuperscript{" + (index+1) + "}")
+        content = content.replace(vocabComponentArray[index][0].toRegex(), vocabComponentArray[index][0] + "\\\\textsuperscript{" + (index+1) + "}\\")
     }
     Files.write(path, content.toByteArray(charset))
 }
 
-fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, vocabComponentArray: ArrayList<ArrayList<String>>){
-    val inputVocabFile: File = File(inputVocabFilename) // get file ready
-    val scan: Scanner = Scanner(inputVocabFile)
-    var vocabLineCount: Int = 0
-    var tmpComponentArrayList:ArrayList<String> = ArrayList<String>()
-    while(scan.hasNextLine()) {
-        val line: String = scan.nextLine() // read all lines
 
+fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>){
+    // add page title, remove indenting
+    outputStoryWriter.println("\\clearpage")
+    outputStoryWriter.println("\\setlength{\\parindent}{0ex}")
+    outputStoryWriter.println("\\centerline{Vocabulary}")
 
-        // split each entry into 2 components: Chinese, English (to find the Chinese in the text)
-        var componentList: List<String> = line.split(" ")
-        var splitIndex: Int = line.indexOf("|")
-        var chineseSplit: String = line.substring(0, splitIndex)
-        var englishSplit: String = line.substring(splitIndex+1, line.length)
-        var ArrayListInitialiser: ArrayList<String> = ArrayList<String>(Collections.singletonList(""))
-
-        // store the whole entry (to go directly into the footer)
-        vocabArray.add(chineseSplit + ": " + englishSplit)
-
-        // store the individual Chinese and English components
-        vocabComponentArray.add(ArrayListInitialiser)
-        vocabComponentArray[vocabLineCount].add(chineseSplit)
-        vocabComponentArray[vocabLineCount].add(englishSplit)
-        vocabComponentArray[vocabLineCount].remove(vocabComponentArray[vocabLineCount][0]) // "uninitilaise" ArrayList empty entry
-
-        vocabLineCount+=1
+    // print all vocab entries to page
+    vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
+        outputStoryWriter.println("" + (index+1) + ". " + vocabComponentArray[index][0] + " " + "\\pinyin{" + vocabComponentArray[index][1]+ "}: " + vocabComponentArray[index][2] + "\\\\")
     }
-    scan.close()
-    println("vocabArray: " + vocabArray)
-    println("vocabComponentArray: " + vocabComponentArray)
 }
-
-fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
-    val inputHeaderFile: File = File(inputHeaderFilename) // get file ready
-    val scan: Scanner = Scanner(inputHeaderFile)
-
-    while(scan.hasNextLine()) {
-        val line: String = scan.nextLine() // read all lines
-        outputStoryWriter.println(line)  // write all header lines to output file
-    }
-    scan.close()
-}
-
-fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
-    val inputHeaderFile: File = File(inputStoryFilename) // get file ready
-    val scan: Scanner = Scanner(inputHeaderFile)
-
-    while(scan.hasNextLine()) {
-        val line: String = scan.nextLine() // read all lines
-        if (line.contains("chapter)")) {   // if a line is has chapter info, do this
-            var chapterString: String = line.substring(7, line.length)  //    substring of line -"chapter"
-            outputStoryWriter.println("\\setstretch{1.5}")
-            outputStoryWriter.println("{\\centering \\LARGE")
-            outputStoryWriter.println("{Chapter N}\\\\") // TODO get chapter number
-            outputStoryWriter.println("{\\uline{"+ chapterString + "}}\\\\}")
-        }
-        else {     // else (for now) assume we have ordinary text
-
-            outputStoryWriter.println(line)
-        // todo: create a new page if a certain number of characters has been written by using \clearpage
-        }
-    }
-    scan.close()
-}
-
 
 
