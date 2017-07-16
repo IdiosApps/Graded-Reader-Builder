@@ -5,6 +5,12 @@ import java.nio.file.Files
 import java.nio.charset.Charset
 import java.nio.file.Paths
 import java.nio.charset.StandardCharsets
+import kotlin.text.Charsets
+import java.io.FileWriter
+
+
+
+
 
 
 
@@ -35,7 +41,7 @@ fun main(args: Array<String>) {
     val inputStoryFilename: String = "res/inputStory"
     val inputVocabFilename: String = "res/inputVocab"
     val inputHeaderFilename: String = "res/inputHeader"
-    val outputStoryFilename: String = "res/outputStory.tex"
+    val outputStoryFilename: String = "res/outputStorytest.tex"
 
     // Create arrays to store vocab info
     var vocabArray: ArrayList<String> = ArrayList<String>()
@@ -47,20 +53,21 @@ fun main(args: Array<String>) {
     // PREPARATION of vocab
     vocabToArray(inputVocabFilename, vocabArray, vocabComponentArray) // take the vocab text and split into components
 
-
     // create output from input files
     writeTexHeader(outputStoryWriter, inputHeaderFilename)
     writeTexStory(outputStoryWriter, inputStoryFilename)
+    outputStoryWriter.close() // close the outputStoryWriter for now (DEBUGGING)
 
     // addVocabFooters()
-    addVocabSubscripts(vocabComponentArray, outputStoryFilename, outputStoryWriter)
+    addVocabSubscripts(vocabComponentArray, outputStoryFilename)
 
     // add vocab page at end
-    //writeTexVocab(outputStoryWriter, inputVocabFilename, vocabComponentArray)
-
+    val outputStoryWriterRevisited = PrintWriter(FileWriter(outputStoryFilename, true))
+    writeTexVocab(outputStoryWriterRevisited, inputVocabFilename, vocabComponentArray)
+    
     // close writing file
-    outputStoryWriter.println("\\end{document}") // end the TeX document
-    outputStoryWriter.close()
+    outputStoryWriterRevisited.append("\\end{document}") // end the TeX document
+    outputStoryWriterRevisited.close()
 }
 
 fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, vocabComponentArray: ArrayList<ArrayList<String>>){
@@ -114,8 +121,8 @@ fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
 }
 
 fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
-    val inputHeaderFile: File = File(inputStoryFilename) // get file ready
-    val scan: Scanner = Scanner(inputHeaderFile)
+    val inputStoryFile: File = File(inputStoryFilename) // get file ready
+    val scan: Scanner = Scanner(inputStoryFile)
 
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines
@@ -125,7 +132,6 @@ fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
             outputStoryWriter.println("{\\uline{" + line + "}}\\\\}")
         }
         else {     // else (for now) assume we have ordinary text
-
             outputStoryWriter.println(line)
         }
     }
@@ -165,20 +171,36 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     }
 }
 
-fun addVocabSubscripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter){
+fun addVocabSubscripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String){
     // open the output file, with header and story
-    val outputStoryFile: File = File(outputStoryFilename)
-    val scan: Scanner = Scanner(outputStoryFile)
+//    val outputStoryFile: File = File(outputStoryFilename)
+//    val scan: Scanner = Scanner(outputStoryFile)
 
     // prepare to replace content in outputStoryFile
     val path = Paths.get(outputStoryFilename)
     val charset = StandardCharsets.UTF_8
     var content = String(Files.readAllBytes(path), charset)
 
+//    val contentNew = readFile("test.txt", StandardCharsets.UTF_8)
+//
+//    var contentbest: String = Files.readAllBytes(Paths.get("res/outputStorytest.tex"));
+//
+    println(File("res\\outputStorytest.tex").readText(charset = Charsets.UTF_8))
+
+
+//    val text = String(Files.toString(File(path), Charsets.UTF_8))
+//    val contentNewMethod = Scanner(File(outputStoryFilename)).useDelimiter("\\Z").next()
+    println("content: " + content)
+//    println("contentNewMethod: " + contentNewMethod)
+    val outStoryLines = Files.readAllLines(Paths.get(outputStoryFilename), charset)
+println(outStoryLines)
+
+
+
     // replace vocab words w/ the same words PLUS sub/superscript info
     vocabComponentArray.forEachIndexed { index, vocabComponentArrayElement ->
         println("attempting to add indexes for vocab: " + vocabComponentArrayElement[0] )
-        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
+        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsubscript{" + (index+1) + "}")
     }
     Files.write(path, content.toByteArray(charset))
 }
