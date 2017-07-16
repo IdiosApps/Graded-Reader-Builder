@@ -7,6 +7,13 @@ import java.nio.file.Paths
 import java.nio.charset.StandardCharsets
 import kotlin.text.Charsets
 import java.io.FileWriter
+import java.lang.Compiler.command
+import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
+import com.sun.deploy.trace.Trace.flush
+
+
+
+
 
 
 
@@ -41,7 +48,8 @@ fun main(args: Array<String>) {
     val inputStoryFilename: String = "res/inputStory"
     val inputVocabFilename: String = "res/inputVocab"
     val inputHeaderFilename: String = "res/inputHeader"
-    val outputStoryFilename: String = "res/outputStorytest.tex"
+    val outputStoryFilename: String = "output/outputStory.tex"
+
 
     // Create arrays to store vocab info
     var vocabArray: ArrayList<String> = ArrayList<String>()
@@ -64,10 +72,13 @@ fun main(args: Array<String>) {
     // add vocab page at end
     val outputStoryWriterRevisited = PrintWriter(FileWriter(outputStoryFilename, true))
     writeTexVocab(outputStoryWriterRevisited, inputVocabFilename, vocabComponentArray)
-    
+
     // close writing file
     outputStoryWriterRevisited.append("\\end{document}") // end the TeX document
     outputStoryWriterRevisited.close()
+
+    // generate pdf via xelatex (installed w/ TeXLive)
+    xelatexToPDF(outputStoryFilename)
 }
 
 fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, vocabComponentArray: ArrayList<ArrayList<String>>){
@@ -172,39 +183,20 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
 }
 
 fun addVocabSubscripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String){
-    // open the output file, with header and story
-//    val outputStoryFile: File = File(outputStoryFilename)
-//    val scan: Scanner = Scanner(outputStoryFile)
-
     // prepare to replace content in outputStoryFile
     val path = Paths.get(outputStoryFilename)
     val charset = StandardCharsets.UTF_8
     var content = String(Files.readAllBytes(path), charset)
 
-//    val contentNew = readFile("test.txt", StandardCharsets.UTF_8)
-//
-//    var contentbest: String = Files.readAllBytes(Paths.get("res/outputStorytest.tex"));
-//
-    println(File("res\\outputStorytest.tex").readText(charset = Charsets.UTF_8))
-
-
-//    val text = String(Files.toString(File(path), Charsets.UTF_8))
-//    val contentNewMethod = Scanner(File(outputStoryFilename)).useDelimiter("\\Z").next()
-    println("content: " + content)
-//    println("contentNewMethod: " + contentNewMethod)
     val outStoryLines = Files.readAllLines(Paths.get(outputStoryFilename), charset)
-println(outStoryLines)
-
-
 
     // replace vocab words w/ the same words PLUS sub/superscript info
     vocabComponentArray.forEachIndexed { index, vocabComponentArrayElement ->
         println("attempting to add indexes for vocab: " + vocabComponentArrayElement[0] )
-        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsubscript{" + (index+1) + "}")
+        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
     }
     Files.write(path, content.toByteArray(charset))
 }
-
 
 fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>){
     // add page title, remove indenting
@@ -218,4 +210,6 @@ fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vo
     }
 }
 
-
+fun xelatexToPDF (outputStoryFilename: String){
+    Runtime.getRuntime().exec("cmd /c start buildPDF.sh")
+}
