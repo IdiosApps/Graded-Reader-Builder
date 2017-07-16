@@ -53,10 +53,10 @@ fun main(args: Array<String>) {
     writeTexStory(outputStoryWriter, inputStoryFilename)
 
     // addVocabFooters()
-    addVocabSubsripts(vocabComponentArray, outputStoryFilename, outputStoryWriter)
+    addVocabSubscripts(vocabComponentArray, outputStoryFilename, outputStoryWriter)
 
     // add vocab page at end
-    writeTexVocab(outputStoryWriter, inputVocabFilename, vocabComponentArray)
+    //writeTexVocab(outputStoryWriter, inputVocabFilename, vocabComponentArray)
 
     // close writing file
     outputStoryWriter.println("\\end{document}") // end the TeX document
@@ -127,10 +127,16 @@ fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
         else {     // else (for now) assume we have ordinary text
 
             outputStoryWriter.println(line)
-        // todo: create a new page if a certain number of characters has been written by using \clearpage
         }
     }
     scan.close()
+
+
+
+    // TODO keep track of the which lines have page ends at
+    //     this would let us scan between these lines, i.e. on a page-by-page basis, and would give us a lot of freedom
+    // 22 lines per page with OR without a chapter
+    //
 }
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
@@ -159,7 +165,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     }
 }
 
-fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter){
+fun addVocabSubscripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter){
     // open the output file, with header and story
     val outputStoryFile: File = File(outputStoryFilename)
     val scan: Scanner = Scanner(outputStoryFile)
@@ -170,8 +176,9 @@ fun addVocabSubsripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputS
     var content = String(Files.readAllBytes(path), charset)
 
     // replace vocab words w/ the same words PLUS sub/superscript info
-    vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
-        content = content.replace(vocabComponentArray[index][0].toRegex(), vocabComponentArray[index][0] + "\\\\textsuperscript{" + (index+1) + "}\\")
+    vocabComponentArray.forEachIndexed { index, vocabComponentArrayElement ->
+        println("attempting to add indexes for vocab: " + vocabComponentArrayElement[0] )
+        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
     }
     Files.write(path, content.toByteArray(charset))
 }
