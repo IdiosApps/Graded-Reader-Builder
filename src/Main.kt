@@ -45,12 +45,15 @@ import com.sun.deploy.trace.Trace.flush
 
 fun main(args: Array<String>) {
     // load input/output files
+
+    val inputHeaderFilename: String = "res/inputHeader"
+    val inputTitleFilename: String = "res/inputTitle"
     val inputStoryFilename: String = "res/inputStory"
+
     val inputVocabFilename: String = "res/inputVocab"
     val inputKeyNamesFilename: String = "res/inputKeyNames"
-    val inputHeaderFilename: String = "res/inputHeader"
-    val outputStoryFilename: String = "output/outputStory.tex"
 
+    val outputStoryFilename: String = "output/outputStory.tex"
 
     // Create arrays to store vocab info
     var vocabArray: ArrayList<String> = ArrayList<String>()
@@ -67,8 +70,9 @@ fun main(args: Array<String>) {
 // TODO rename this function and the variables inside it, to generalise
 
     // create output from input files
-    writeTexHeader(outputStoryWriter, inputHeaderFilename)
-    writeTexStory(outputStoryWriter, inputStoryFilename)
+    copyToTex(outputStoryWriter, inputHeaderFilename)
+    copyToTex(outputStoryWriter, inputTitleFilename)
+    copyToTex(outputStoryWriter, inputStoryFilename)
     outputStoryWriter.close() // close the outputStoryWriter for now (DEBUGGING)
 
     // addVocabFooters()
@@ -126,20 +130,9 @@ fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComp
     scan.close()
 }
 
-fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
-    val inputHeaderFile: File = File(inputHeaderFilename) // get file ready
-    val scan: Scanner = Scanner(inputHeaderFile)
-
-    while(scan.hasNextLine()) {
-        val line: String = scan.nextLine() // read all lines
-        outputStoryWriter.println(line)  // write all header lines to output file
-    }
-    scan.close()
-}
-
-fun writeTexStory(outputStoryWriter: PrintWriter, inputStoryFilename: String){
-    val inputStoryFile: File = File(inputStoryFilename) // get file ready
-    val scan: Scanner = Scanner(inputStoryFile)
+fun copyToTex(outputStoryWriter: PrintWriter, inputFilename: String){
+    val inputFile: File = File(inputFilename) // get file ready
+    val scan: Scanner = Scanner(inputFile)
 
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines

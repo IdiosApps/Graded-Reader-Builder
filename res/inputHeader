@@ -65,22 +65,7 @@
 %\leftskip=0cm plus 0.5fil \rightskip=0cm plus -0.5fil
 %\parfillskip=0cm plus 1fil
 
-% Title Page
-\title{James' Chinese Graded Reader LaTeX Template}
-\author{Idios/JC}
-
-
-%%%%% Begin Document
-\begin{document}
-	
-%Make title page	
-\maketitle
-%Make info page
-%\clearpage
-%Why was this book written?
-%This template was written to help contribute to the pool of Chinese graded readers, which allow readers to understand and follow a story written with simple language - with the aim of improving their reading ability whilst having a lot of fun!
-%\clearpage
-
-\clearpage
-
 \setstretch{2.0}
+
+
+
