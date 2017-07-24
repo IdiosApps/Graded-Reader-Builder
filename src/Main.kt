@@ -47,6 +47,7 @@ fun main(args: Array<String>) {
     // load input/output files
     val inputStoryFilename: String = "res/inputStory"
     val inputVocabFilename: String = "res/inputVocab"
+    val inputKeyNamesFilename: String = "res/inputKeyNames"
     val inputHeaderFilename: String = "res/inputHeader"
     val outputStoryFilename: String = "output/outputStory.tex"
 
@@ -54,12 +55,16 @@ fun main(args: Array<String>) {
     // Create arrays to store vocab info
     var vocabArray: ArrayList<String> = ArrayList<String>()
     var vocabComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
+    var keyNameArray: ArrayList<String> = ArrayList<String>()
+    var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
 
     // create writer for output
     val outputStoryWriter = PrintWriter(outputStoryFilename, "UTF-8")
 
-    // PREPARATION of vocab
-    vocabToArray(inputVocabFilename, vocabArray, vocabComponentArray) // take the vocab text and split into components
+    // PREPARATION of vocab, key names, etc.
+    vocabToArray(inputVocabFilename, vocabArray, vocabComponentArray) // split input text file into arrays of components
+    vocabToArray(inputKeyNamesFilename, keyNameArray, keyNameComponentArray)
+// TODO rename this function and the variables inside it, to generalise
 
     // create output from input files
     writeTexHeader(outputStoryWriter, inputHeaderFilename)
@@ -67,7 +72,10 @@ fun main(args: Array<String>) {
     outputStoryWriter.close() // close the outputStoryWriter for now (DEBUGGING)
 
     // addVocabFooters()
-    addVocabSubscripts(vocabComponentArray, outputStoryFilename)
+    addMarkup(vocabComponentArray, outputStoryFilename,"superscript")
+    addMarkup(keyNameComponentArray, outputStoryFilename,"underline")
+    // todo generalise this function
+
 
     // add vocab page at end
     val outputStoryWriterRevisited = PrintWriter(FileWriter(outputStoryFilename, true))
@@ -81,16 +89,16 @@ fun main(args: Array<String>) {
     xelatexToPDF(outputStoryFilename)
 }
 
-fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, vocabComponentArray: ArrayList<ArrayList<String>>){
-    val inputVocabFile: File = File(inputVocabFilename) // get file ready
-    val scan: Scanner = Scanner(inputVocabFile)
-    var vocabLineCount: Int = 0
+fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
+    val inputFile: File = File(inputFilename) // get file ready
+    val scan: Scanner = Scanner(inputFile)
+    var lineCount: Int = 0
     var tmpComponentArrayList:ArrayList<String> = ArrayList<String>()
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines
 
 
-        // split each entry into 3 components: Chinese, Pinyin, English
+        // split each entry into 3 components (e.g. Chinese, Pinyin, English)
         // get Chinese & Pinyin-English substrings
         var componentList: List<String> = line.split(" ")
         var zhPinyinSplitIndex: Int = line.indexOf("|")
@@ -104,20 +112,18 @@ fun vocabToArray(inputVocabFilename: String, vocabArray: ArrayList<String>, voca
         var ArrayListInitialiser: ArrayList<String> = ArrayList<String>(Collections.singletonList(""))
 
         // store the whole entry (to go directly into the footer)
-        vocabArray.add(chineseSplit + pinyinSplit + ": " + englishSplit)
+        inputArray.add(chineseSplit + pinyinSplit + ": " + englishSplit)
 
         // store the individual Chinese and English components
-        vocabComponentArray.add(ArrayListInitialiser)
-        vocabComponentArray[vocabLineCount].add(chineseSplit)
-        vocabComponentArray[vocabLineCount].add(pinyinSplit)
-        vocabComponentArray[vocabLineCount].add(englishSplit)
-        vocabComponentArray[vocabLineCount].remove(vocabComponentArray[vocabLineCount][0]) // "uninitilaise" ArrayList empty entry
+        inputComponentArray.add(ArrayListInitialiser)
+        inputComponentArray[lineCount].add(chineseSplit)
+        inputComponentArray[lineCount].add(pinyinSplit)
+        inputComponentArray[lineCount].add(englishSplit)
+        inputComponentArray[lineCount].remove(inputComponentArray[lineCount][0]) // "uninitilaise" ArrayList empty entry
 
-        vocabLineCount+=1
+        lineCount+=1
     }
     scan.close()
-    println("vocabArray: " + vocabArray)
-    println("vocabComponentArray: " + vocabComponentArray)
 }
 
 fun writeTexHeader(outputStoryWriter: PrintWriter, inputHeaderFilename: String){
@@ -182,18 +188,20 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     }
 }
 
-fun addVocabSubscripts(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String){
+fun addMarkup(inputArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, markupType: String){
     // prepare to replace content in outputStoryFile
     val path = Paths.get(outputStoryFilename)
     val charset = StandardCharsets.UTF_8
     var content = String(Files.readAllBytes(path), charset)
 
-    val outStoryLines = Files.readAllLines(Paths.get(outputStoryFilename), charset)
-
-    // replace vocab words w/ the same words PLUS sub/superscript info
-    vocabComponentArray.forEachIndexed { index, vocabComponentArrayElement ->
-        println("attempting to add indexes for vocab: " + vocabComponentArrayElement[0] )
-        content = content.replace(vocabComponentArrayElement[0].toRegex(), vocabComponentArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
+    // replace add markup to existing words (via replacement)
+    inputArray.forEachIndexed { index, inputArrayElement ->
+        if (markupType=="underline"){
+            content = content.replace(inputArrayElement[0].toRegex(), "\\\\uline{" + inputArrayElement[0] + "}")
+        }
+        else if (markupType=="superscript"){
+            content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
+        }
     }
     Files.write(path, content.toByteArray(charset))
 }
@@ -213,3 +221,5 @@ fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vo
 fun xelatexToPDF (outputStoryFilename: String){
     Runtime.getRuntime().exec("cmd /c start buildPDF.sh")
 }
+
+// TODO fun writeTexGrammar

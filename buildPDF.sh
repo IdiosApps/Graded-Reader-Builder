@@ -1,1 +1,1 @@
- cd output && xelatex ../output/outputStory.tex
+ cd output && xelatex outputStory.tex
