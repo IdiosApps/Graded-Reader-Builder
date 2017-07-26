@@ -43,6 +43,8 @@ import org.apache.pdfbox.text.PDFTextStripper
 //\end{figure}
 
 
+//TODO: Foreach[vocabHanzi] Scan through pages 1->end until first refererence is found. Repeat for all vocab. Note pages, change superscripts, add footers....
+
 fun main(args: Array<String>) {
     // load input/output files
 
@@ -94,7 +96,7 @@ fun main(args: Array<String>) {
 //    xelatexToPDF(outputStoryFilename)
 
     // get pdf info
-    readPDF(outputPDFFilename)
+    readPDF(outputPDFFilename, vocabComponentArray)
 }
 
 fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
@@ -165,7 +167,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     val scan: Scanner = Scanner(outputStoryFile)
     // for each word in our vocab list, find the first entry and add a footer
     // n.b. add superscripts later
-    vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
+    vocabComponentArray.forEachIndexed { index, currentComponentArray ->
         while(scan.hasNextLine()) {
             val line: String = scan.nextLine()
             if (line.contains((vocabComponentArray[index][0]))) {
@@ -210,7 +212,7 @@ fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vo
     outputStoryWriter.println("\\centerline{Vocabulary}")
 
     // print all vocab entries to page
-    vocabComponentArray.forEachIndexed { index, currentSubStringWordType ->
+    vocabComponentArray.forEachIndexed { index, currentComponentArray ->
         outputStoryWriter.println("" + (index+1) + ". " + vocabComponentArray[index][0] + " " + "\\pinyin{" + vocabComponentArray[index][1]+ "}: " + vocabComponentArray[index][2] + "\\\\")
     }
 }
@@ -220,22 +222,41 @@ fun xelatexToPDF (outputStoryFilename: String){
 }
 
 
-
-
-fun readPDF (PDFFilename: String){
+// TODO add footers for each page
+fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>){
+    val PDFFile: File = File(PDFFilename)
+    val documentPDF: PDDocument = PDDocument.load(PDFFile)
 
     try {
-        val PDFFile: File = File(PDFFilename)
-        val documentPDF: PDDocument = PDDocument.load(PDFFile)
+        vocabComponentArray.forEachIndexed { index, currentVocabComponent ->
+            var pageCounter: Int = 1 // start at page 1 for each vocab Hanzi
+            var pdfPageText: String = ""
+//          println("Hanzi to find: " + currentVocabHanzi[0])
 
-        val stripper = PDFTextStripper()
-        stripper.startPage = 1
-        stripper.endPage = 2
-        val result = stripper.getText(documentPDF)
-        println(result)
-        documentPDF.close()
+            while(!pdfPageText.contains(currentVocabComponent[0])) {
+                val stripper = PDFTextStripper()
+                stripper.startPage = pageCounter
+                stripper.endPage = pageCounter+1
+                pdfPageText = stripper.getText(documentPDF)
+
+//                println(pdfPageText)
+
+                if (pdfPageText.contains(currentVocabComponent[0])){
+                    println("Hanzi " + currentVocabComponent[0] + " - found in page " + pageCounter)
+                    currentVocabComponent.add(Integer.toString(pageCounter))
+                }
+
+                pageCounter +=1 // prepare to look at next page
+            }
+            println(currentVocabComponent)
+        }
     }
-    catch(e: Exception){}
+    catch(e: Exception){
+
+    }
+
+    documentPDF.close()
+
 
 }
 
