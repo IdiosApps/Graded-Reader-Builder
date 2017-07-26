@@ -2,14 +2,14 @@ import java.io.File
 import java.io.PrintWriter
 import java.util.*
 import java.nio.file.Files
-import java.nio.charset.Charset
 import java.nio.file.Paths
 import java.nio.charset.StandardCharsets
-import kotlin.text.Charsets
 import java.io.FileWriter
-import java.lang.Compiler.command
-import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
-import com.sun.deploy.trace.Trace.flush
+
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.text.PDFTextStripper
+
+
 
 
 
@@ -54,6 +54,7 @@ fun main(args: Array<String>) {
     val inputKeyNamesFilename: String = "res/inputKeyNames"
 
     val outputStoryFilename: String = "output/outputStory.tex"
+    val outputPDFFilename: String = "output/outputStory.pdf"
 
     // Create arrays to store vocab info
     var vocabArray: ArrayList<String> = ArrayList<String>()
@@ -90,7 +91,10 @@ fun main(args: Array<String>) {
     outputStoryWriterRevisited.close()
 
     // generate pdf via xelatex (installed w/ TeXLive)
-    xelatexToPDF(outputStoryFilename)
+//    xelatexToPDF(outputStoryFilename)
+
+    // get pdf info
+    readPDF(outputPDFFilename)
 }
 
 fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
@@ -214,5 +218,26 @@ fun writeTexVocab(outputStoryWriter: PrintWriter, inputVocabFilename: String, vo
 fun xelatexToPDF (outputStoryFilename: String){
     Runtime.getRuntime().exec("cmd /c start buildPDF.sh")
 }
+
+
+
+
+fun readPDF (PDFFilename: String){
+
+    try {
+        val PDFFile: File = File(PDFFilename)
+        val documentPDF: PDDocument = PDDocument.load(PDFFile)
+
+        val stripper = PDFTextStripper()
+        stripper.startPage = 1
+        stripper.endPage = 2
+        val result = stripper.getText(documentPDF)
+        println(result)
+        documentPDF.close()
+    }
+    catch(e: Exception){}
+
+}
+
 
 // TODO fun writeTexGrammar
