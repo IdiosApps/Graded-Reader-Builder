@@ -46,6 +46,7 @@ fun main(args: Array<String>) {
     val inputKeyNamesFilename: String = "res/inputKeyNames"
 
     val outputStoryFilename: String = "output/outputStory.tex"
+    val outputMarkedUpStoryFilename: String = "output/outputStoryMarked.tex"
     val outputPDFFilename: String = "output/outputStory.pdf"
 
     // Create arrays to store vocab info
@@ -54,6 +55,7 @@ fun main(args: Array<String>) {
     var keyNameArray: ArrayList<String> = ArrayList<String>()
     var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
     var pdfPageFirstSentences: ArrayList<String> = ArrayList<String>()
+    var texLinesPDFPageFirstSentence: ArrayList<Int> = ArrayList<Int>()
     ;
     // create writer for output
     val outputStoryWriter = PrintWriter(outputStoryFilename, "UTF-8")
@@ -87,17 +89,36 @@ fun main(args: Array<String>) {
     readPDF(outputPDFFilename, vocabComponentArray, pdfPageFirstSentences)
 
     // recreate pdf w/ markup (and TODO: footers)
-    // add footers before markup, so footers get marked up (simple solution, maybe not the most elegant...
-    // footer items will begin with superscripted hanzi, not e.g. "1. "我是..."
+
+    getTexLineNumber(outputStoryFilename, pdfPageFirstSentences, texLinesPDFPageFirstSentence)
+    println("sentences " + pdfPageFirstSentences + " at TeX lines " + texLinesPDFPageFirstSentence)
 
     // add markup
-    addMarkup(vocabComponentArray, outputStoryFilename,"superscript")
-    addMarkup(keyNameComponentArray, outputStoryFilename,"underline")
+    addMarkup(vocabComponentArray, outputStoryFilename, "superscript")
+    addMarkup(keyNameComponentArray, outputStoryFilename, "underline")
 
-    // TODO FOR A GIVEN PAGE: COMPARE PDF-STRIPPED TEXT (1ST SENTENCE?) W/ TEX(THAT'S HAD MARKUPS REMOVED) TO GET LINE NUMBER IN .TEX FILE
     // FOR ALL PAGES, FOR EACH VOCAB COMPONENT WHOSE PAGE NUMBER EQUALS PAGE NUMBER....
 
     xelatexToPDF(outputStoryFilename)
+}
+
+fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayList<String>, texLinesPDFPageFirstSentence: ArrayList<Int>){
+
+    println("pdfPageFirstSentences: " + pdfPageFirstSentences)
+    pdfPageFirstSentences.forEachIndexed { index, pdfPageFirstSentence ->
+        val inputFile: File = File(outputStoryFilename) // get file ready
+        val scan: Scanner = Scanner(inputFile)
+        var lineCount: Int = 0
+
+        while (scan.hasNextLine()) {                              // TODO stop scanning when the first occurance is met
+            val line: String = scan.nextLine()
+            if (line.contains(pdfPageFirstSentence)) {
+                texLinesPDFPageFirstSentence.add(lineCount+1)
+            }
+            lineCount+=1
+        }
+        scan.close()
+    }
 }
 
 fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
@@ -282,7 +303,7 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
 
     // Get the first sentence of each page, and save to array
     try {
-        println("TRYING TO GET FIRST SENTENCE")
+
         var pdfPageText: String = ""
         var pageCounter: Int = 2 // start at page 1
         while (pageCounter<numberOfPages) { // for each page
@@ -302,17 +323,7 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
     catch(e: Exception){    }
 
     documentPDF.close()
-    println("")
-    println("vocabComponentArray: " + vocabComponentArray)
-    println("pdfPageFirstSentences: " + pdfPageFirstSentences)
 }
-
-fun findFirstPageLinesInTex(){
-
-    
-}
-
-
 
 
 // TODO fun writeTexGrammar
