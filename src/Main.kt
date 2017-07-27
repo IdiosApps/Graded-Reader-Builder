@@ -78,10 +78,7 @@ fun main(args: Array<String>) {
     copyToTex(outputStoryWriter, inputStoryFilename)
     outputStoryWriter.close() // close the outputStoryWriter for now (DEBUGGING)
 
-    // addVocabFooters()
-    addMarkup(vocabComponentArray, outputStoryFilename,"superscript")
-    addMarkup(keyNameComponentArray, outputStoryFilename,"underline")
-    // todo generalise this function
+
 
 
     // add vocab page at end
@@ -93,10 +90,17 @@ fun main(args: Array<String>) {
     outputStoryWriterRevisited.close()
 
     // generate pdf via xelatex (installed w/ TeXLive)
-//    xelatexToPDF(outputStoryFilename)
+    xelatexToPDF(outputStoryFilename)
 
     // get pdf info
     readPDF(outputPDFFilename, vocabComponentArray)
+
+    // add markup
+    addMarkup(vocabComponentArray, outputStoryFilename,"superscript")
+    addMarkup(keyNameComponentArray, outputStoryFilename,"underline")
+
+    // recreate pdf w/ markup (and TODO: footers)
+    xelatexToPDF(outputStoryFilename)
 }
 
 fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
@@ -199,7 +203,7 @@ fun addMarkup(inputArray: ArrayList<ArrayList<String>>, outputStoryFilename: Str
             content = content.replace(inputArrayElement[0].toRegex(), "\\\\uline{" + inputArrayElement[0] + "}")
         }
         else if (markupType=="superscript"){
-            content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + (index+1) + "}")
+            content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + inputArrayElement[3] + "." + (index+1) + "}")
         }
     }
     Files.write(path, content.toByteArray(charset))
