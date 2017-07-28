@@ -9,6 +9,9 @@ import java.io.FileWriter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import java.lang.Integer.parseInt
+import sun.text.normalizer.UTF16.append
+
+
 
 
 /**
@@ -56,6 +59,7 @@ fun main(args: Array<String>) {
     var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
     var pdfPageFirstSentences: ArrayList<String> = ArrayList<String>()
     var texLinesPDFPageFirstSentence: ArrayList<Int> = ArrayList<Int>()
+    var pdfNumberOfPages: Int = 0
     ;
     // create writer for output
     val outputStoryWriter = PrintWriter(outputStoryFilename, "UTF-8")
@@ -86,7 +90,7 @@ fun main(args: Array<String>) {
     xelatexToPDF(outputStoryFilename)
 
     // get pdf info
-    readPDF(outputPDFFilename, vocabComponentArray, pdfPageFirstSentences)
+    readPDF(outputPDFFilename, vocabComponentArray, pdfPageFirstSentences, pdfNumberOfPages)
 
     // recreate pdf w/ markup (and TODO: footers)
 
@@ -97,9 +101,21 @@ fun main(args: Array<String>) {
     addMarkup(vocabComponentArray, outputStoryFilename, "superscript")
     addMarkup(keyNameComponentArray, outputStoryFilename, "underline")
 
+    // get the vocab entry indices (for footers)
+    getVocabIndicies(vocabComponentArray)
+println("vocabComponentArray: " + vocabComponentArray)
+
+    addVocabFooters(vocabComponentArray, outputStoryFilename, outputStoryWriter, texLinesPDFPageFirstSentence, pdfNumberOfPages)
+
     // FOR ALL PAGES, FOR EACH VOCAB COMPONENT WHOSE PAGE NUMBER EQUALS PAGE NUMBER....
 
     xelatexToPDF(outputStoryFilename)
+}
+
+fun getVocabIndicies(vocabComponentArray: ArrayList<ArrayList<String>>){
+    vocabComponentArray.forEachIndexed { index, vocabElement ->
+        vocabElement.add(Integer.toString(index))
+    }
 }
 
 fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayList<String>, texLinesPDFPageFirstSentence: ArrayList<Int>){
@@ -176,59 +192,63 @@ fun copyToTex(outputStoryWriter: PrintWriter, inputFilename: String){
     scan.close()
 }
 
-fun addVocabFootersOld(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
-    // open the output file, with header and story
-    val outputStoryFile: File = File(outputStoryFilename)
-    val scan: Scanner = Scanner(outputStoryFile)
-    // for each word in our vocab list, find the first entry and add a footer
-    // n.b. add superscripts later
-    vocabComponentArray.forEachIndexed { index, currentComponentArray ->
-        while(scan.hasNextLine()) {
-            val line: String = scan.nextLine()
-            if (line.contains((vocabComponentArray[index][0]))) {
-                // add footer text                  TODO figure out how to approach this
-//                \lfoot{
-//                    x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\
-//                    x. 啊 (\pinyin{a1}) who knows..\\
-//                    x. 聪明 (\pinyin{cong1ming}) intelligent\\
-//                }
-//
 
-                outputStoryWriter.println("\\setstretch{1.5}")
 
-                break
-            }
-        }
-    }
-}
-
-// TODO FOR A GIVEN PAGE: COMPARE PDF-STRIPPED TEXT (1ST SENTENCE?) W/ TEX(THAT'S HAD MARKUPS REMOVED) TO GET LINE NUMBER IN .TEX FILE
 // FOR ALL PAGES, FOR EACH VOCAB COMPONENT WHOSE PAGE NUMBER EQUALS PAGE NUMBER....
 
-fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter ){
-    // open the output file, with header and story
+fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter, texLinesPDFPageFirstSentence: ArrayList<Int>, pdfNumberOfPages: Int){
+    var pageNumber: Int = 2
     val outputStoryFile: File = File(outputStoryFilename)
     val scan: Scanner = Scanner(outputStoryFile)
-    // for each word in our vocab list, find the first entry and add a footer
-    // n.b. add superscripts later
-    vocabComponentArray.forEachIndexed { index, currentComponentArray ->
-        while(scan.hasNextLine()) {
-            val line: String = scan.nextLine()
-            if (line.contains((vocabComponentArray[index][0]))) {
-                // add footer text                  TODO figure out how to approach this
-//                \lfoot{
-//                    x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\
-//                    x. 啊 (\pinyin{a1}) who knows..\\
-//                    x. 聪明 (\pinyin{cong1ming}) intelligent\\
-//                }
+    var texLineNumber: Int = 0
+
+    generateFooters(vocabComponentArray,pageNumber)
+
+// TODO: CREATE FUNCTION TO GENERATE THE LINE TO INSERT (LFOOT,RFOOT FOR VOCAB)
+//generateFooters(vocabComponentArray,
+//        texLinesPDFPageFirstSentence.forEachIndexed { index, texLineForPageBegin ->
+//        val texPath = Paths.get(outputStoryFilename)
+//        val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
+//        lines.add(texLineForPageBegin+1, extraLine)
+//        Files.write(texPath, lines, StandardCharsets.UTF_8)
 //
+//
+//    }
 
-                outputStoryWriter.println("\\setstretch{1.5}")
 
-                break
-            }
+
+}
+
+fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int){
+    var pagesVocab: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
+    var rightFooter: String = "\\rfoot{ "
+    val leftFooter = StringBuilder("\\lfoot{ ")// .append(c).append(d) // .toString()
+    var leftFooterCounter: Int = 0
+    var rightFooterCounter: Int = 0
+
+    vocabComponentArray.forEachIndexed { index, currentVocab ->
+
+        if(Integer.parseInt(currentVocab[3])==pageNumber){
+            pagesVocab.add(currentVocab)        //note to self. initialise then remove first array element?
         }
+    println("pagesVocab: " + pagesVocab)
     }
+
+    if ((pagesVocab.size % 2)==0) {   // even number of vocab on page
+        while (leftFooterCounter<=pagesVocab.size){
+            leftFooter.append(currentVocab[4])
+            //    \lfoot{	x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\ 	x. 啊 (\pinyin{a1}) who knows..\\ 	x. 聪明 (\pinyin{cong1ming}) intelligent\\ }
+//    \rfoot{ x. 比如 (\pinyin{bi3ru2}) for example\\        x. 再问 (\pinyin{zai4wen4}) ask again\\	x. 谁知道 (\pinyin{shei2zhi1dao}） who knows..?\\ }
+            leftFooterCounter+=2
+        }
+        leftFooter
+        // have half rfoot half lfoot
+    }
+    else {  // odd number of vocab on page
+        // lfoot = rfoot+1
+    }
+
+
 }
 
 
@@ -270,11 +290,11 @@ fun xelatexToPDF (outputStoryFilename: String){
 
 
 
-fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>){
+fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>, pdfNumberOfPages: Int){
     val PDFFile: File = File(PDFFilename)
     val documentPDF: PDDocument = PDDocument.load(PDFFile)
-    val numberOfPages = documentPDF.getNumberOfPages()
-    println("Number of pages: " + numberOfPages)
+    val pdfNumberOfPages = documentPDF.getNumberOfPages()
+    println("Number of pages: " + pdfNumberOfPages)
 
     // Find the first instance of each vocabulary word
     try {
@@ -306,7 +326,7 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
 
         var pdfPageText: String = ""
         var pageCounter: Int = 2 // start at page 1
-        while (pageCounter<numberOfPages) { // for each page
+        while (pageCounter<pdfNumberOfPages) { // for each page
             val stripper = PDFTextStripper()
             stripper.startPage = pageCounter
             stripper.endPage = pageCounter
