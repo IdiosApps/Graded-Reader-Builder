@@ -8,6 +8,8 @@ You may need to:
 * Compile with XeLaTeX (Options -> configure TeXstudio -> build tab (on left) -> default compiler: XeLaTeX)
 
 TODO: 
+* Add image examples of key features to readme
+* Write down key features in readme
 * Check which packages I've used, and give credit where it's due
 * Set up a wiki-like site where user-created content (after review, to prevent copyright infringement?) can be searched e.g. by level, length, rating, etc.
 * Set up a server that can take input (story, vocab, characters, etc.) and securely process it so that users can use this tool without having to download either the code or any required programs.
