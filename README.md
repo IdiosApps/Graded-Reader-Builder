@@ -7,8 +7,8 @@ Graded Reader Builder lets people create professional-quality graded readers fro
 
 ## 1. Graded Reader Builder Input & Output
 
-[[https://github.com/IdiosApps/Graded-Reader-Builder/blob/master/RepoFiles/Graded-Reader-Builder-Inputs.png]]
-[[https://github.com/IdiosApps/Graded-Reader-Builder/blob/master/RepoFiles/Graded-Reader-Builder-Vocab(CN-EN).png]]
+[[https://raw.githubusercontent.com/IdiosApps/Graded-Reader-Builder/master/RepoFiles/Graded-Reader-Builder-Inputs.png]
+[[https://raw.githubusercontent.com/IdiosApps/Graded-Reader-Builder/master/RepoFiles/Graded-Reader-Builder-Vocab(CN-EN).png]]
 [[https://github.com/IdiosApps/Graded-Reader-Builder/blob/master/RepoFiles/Graded-Reader-Builder-OutputExample.png]]
 
 The example pdf is available [here](../RepoFiles/ExampleGradedReader.pdf)
