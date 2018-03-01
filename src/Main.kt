@@ -9,8 +9,6 @@ import java.io.FileWriter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import java.lang.Integer.parseInt
-import sun.text.normalizer.UTF16.append
-import java.lang.Math.ceil
 
 
 /**
@@ -222,7 +220,7 @@ fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumbe
 
     // get vocab used in current page
     vocabComponentArray.forEachIndexed { index, currentVocab ->
-        if(Integer.parseInt(currentVocab[3])==pageNumber){
+        if(parseInt(currentVocab[3]) ==pageNumber){
             pagesVocab.add(currentVocab)
         }
     }
@@ -233,21 +231,21 @@ fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumbe
     if ((pagesVocab.size % 2)==0) {   // even number of vocab on page
         while (FooterCounter<(pagesVocab.size/2)){
             var vocabIndex: String = ""
-            leftFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4])+1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
+            leftFooter.append(parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
             FooterCounter+=1
         }
         while (FooterCounter<(pagesVocab.size)){
-            rightFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4])+1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
+            rightFooter.append(parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
             FooterCounter+=1
         }
     }
     else {  // odd number of vocab on page
         while (FooterCounter<(((pagesVocab.size)+1)/2)){ // e.g. 2 left, 1 right
-            leftFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4])+1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
+            leftFooter.append(parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
             FooterCounter+=1
         }
         while (FooterCounter<(pagesVocab.size)){ // rfoot takes what's left of the page's vocab
-            rightFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4])+1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
+            rightFooter.append(parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
             FooterCounter+=1
         }
     }
