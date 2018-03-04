@@ -7,9 +7,9 @@ Graded Reader Builder lets people create professional-quality graded readers fro
 
 ## 1. Graded Reader Builder Input & Output
 
-<img src="examples/Graded-Reader-Builder-Inputs.png" width="846">
-<img src="examples/Graded-Reader-Builder-Vocab(CN-EN).png" width="846">
-<img src="examples/Graded-Reader-Builder-OutputExample.png" width="846">
+<img src="examples/Graded-Reader-Builder-Inputs.png" width="250">
+<img src="examples/Graded-Reader-Builder-Vocab(CN-EN).png" width="250">
+<img src="examples/Graded-Reader-Builder-OutputExample.png" width="400">
 
 The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
