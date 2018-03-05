@@ -7,11 +7,13 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, outputStoryWriter: PrintWriter, texLinesPDFPageFirstSentence: ArrayList<Int>, pdfNumberOfPages: Int, leftFooter: StringBuilder, rightFooter: StringBuilder){
-    var pageNumber: Int = 2
-    val outputStoryFile: File = File(outputStoryFilename)
-    val scan: Scanner = Scanner(outputStoryFile)
-    var texLineNumber: Int = 0
+fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageFirstSentence: ArrayList<Int>){
+    var pageNumber = 2
+    val outputStoryFile = File(outputStoryFilename)
+    var rightFooter = StringBuilder("\\rfoot{ ")// .append(c).append(d) // .toString()
+    var leftFooter = StringBuilder("\\lfoot{ ")// .append(c).append(d) // .toString()
+
+    VocabUtils.getVocabIndicies(vocabComponentArray) // add vocab "order of appearance" index
 
     generateFooters(vocabComponentArray,pageNumber,leftFooter,rightFooter)
     println("leftFooter: " + leftFooter)
@@ -28,7 +30,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
 
 fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int, leftFooter: StringBuilder, rightFooter: StringBuilder){
     var pagesVocab: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
-    var FooterCounter: Int = 0
+    var FooterCounter = 0
 
     // get vocab used in current page
     vocabComponentArray.forEachIndexed { index, currentVocab ->
@@ -42,7 +44,6 @@ fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumbe
     //    \rfoot{ x. 比如 (\pinyin{bi3ru2}) for example\\        x. 再问 (\pinyin{zai4wen4}) ask again\\	x. 谁知道 (\pinyin{shei2zhi1dao}） who knows..?\\ }
     if ((pagesVocab.size % 2)==0) {   // even number of vocab on page
         while (FooterCounter<(pagesVocab.size/2)){
-            var vocabIndex: String = ""
             leftFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
             FooterCounter+=1
         }
