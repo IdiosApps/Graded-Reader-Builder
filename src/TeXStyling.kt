@@ -1,17 +1,17 @@
-package Markup
+package TeXStyling
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.ArrayList
 
-fun addMarkup(inputArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, markupType: String){
+fun addStyling(inputArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, markupType: String){
     // prepare to replace content in outputStoryFile
     val path = Paths.get(outputStoryFilename)
     val charset = StandardCharsets.UTF_8
     var content = String(Files.readAllBytes(path), charset)
 
-    // replace add markup to existing words (via replacement)
+    // add styling to specific words
     inputArray.forEachIndexed { index, inputArrayElement ->
         if (markupType=="underline"){
             content = content.replace(inputArrayElement[0].toRegex(), "\\\\uline{" + inputArrayElement[0] + "}")

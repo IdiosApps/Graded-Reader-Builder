@@ -1,11 +1,12 @@
 package Footers
 
 import java.io.File
-import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+
+// TODO tidy up, and get it working properly!
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageFirstSentence: ArrayList<Int>){
     var pageNumber = 2

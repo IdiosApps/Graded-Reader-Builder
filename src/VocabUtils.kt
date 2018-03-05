@@ -9,39 +9,34 @@ fun getVocabIndicies(vocabComponentArray: ArrayList<ArrayList<String>>){
     }
 }
 
-fun vocabToArray(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
-    val inputFile: File = File(inputFilename) // get file ready
-    val scan: Scanner = Scanner(inputFile)
-    var lineCount: Int = 0
-    var tmpComponentArrayList: ArrayList<String> = ArrayList<String>()
+fun splitVocabIntoParts(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
+println("Trying to split vocab")
+    val inputFile = File(inputFilename)
+    val scan = Scanner(inputFile)
+    var vocabIndex = 0
     while(scan.hasNextLine()) {
-        val line: String = scan.nextLine() // read all lines
+        var vocabLine: String = scan.nextLine()
 
+        // split each entry into n components (e.g. Chinese, Pinyin, and then English)
+        var vocabSplitParts = ArrayList<String>()
+        while (vocabLine.contains("|")){
+            vocabSplitParts.add(vocabLine.substring(0, vocabLine.indexOf("|")))
+            vocabLine = vocabLine.substring(vocabLine.indexOf("|")+1, vocabLine.length)
+            println(vocabLine)
+        }
+        vocabSplitParts.add(vocabLine.substring(0, vocabLine.length)) // add the part after the last |
 
-        // split each entry into 3 components (e.g. Chinese, Pinyin, English)
-        // get Chinese & Pinyin-English substrings
-        var componentList: List<String> = line.split(" ")
-        var zhPinyinSplitIndex: Int = line.indexOf("|")
-        var chineseSplit: String = line.substring(0, zhPinyinSplitIndex)
-        var pinyinEnglishSubstring: String = line.substring(zhPinyinSplitIndex+1, line.length)
-        // get Pinyin and English substrings
-        var pinyinEnglishSplitIndex: Int = pinyinEnglishSubstring.indexOf("|")
-        var pinyinSplit: String = pinyinEnglishSubstring.substring(0, pinyinEnglishSplitIndex)
-        var englishSplit: String = pinyinEnglishSubstring.substring(pinyinEnglishSplitIndex+1, pinyinEnglishSubstring.length)
+        // initialise an array, add vocabSplitParts, then remove the initialising entry. TODO clean this up (no rush!)
+        var arrayListInitialiser: ArrayList<String> = ArrayList(Collections.singletonList(""))
+        inputComponentArray.add(arrayListInitialiser)
 
-        var ArrayListInitialiser: ArrayList<String> = ArrayList<String>(Collections.singletonList(""))
-
-        // store the whole entry (to go directly into the footer)
-        inputArray.add(chineseSplit + pinyinSplit + ": " + englishSplit)
-
-        // store the individual Chinese and English components
-        inputComponentArray.add(ArrayListInitialiser)
-        inputComponentArray[lineCount].add(chineseSplit)
-        inputComponentArray[lineCount].add(pinyinSplit)
-        inputComponentArray[lineCount].add(englishSplit)
-        inputComponentArray[lineCount].remove(inputComponentArray[lineCount][0]) // "uninitilaise" ArrayList empty entry
-
-        lineCount+=1
+        var addVocabPartIndex = 0
+        while (addVocabPartIndex < vocabSplitParts.size){
+            inputComponentArray[vocabIndex].add(vocabSplitParts[addVocabPartIndex])
+            addVocabPartIndex += 1
+        }
+        inputComponentArray[vocabIndex].remove(inputComponentArray[vocabIndex][0]) // "uninitilaise" ArrayList empty entry
+        vocabIndex+=1
     }
     scan.close()
 }

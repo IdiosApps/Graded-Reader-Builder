@@ -10,18 +10,17 @@ fun xelatexToPDF (outputStoryFilename: String){
         val exitVal = process.waitFor()
     }
 
-fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>, pdfNumberOfPages: Int){
-    val PDFFile: File = File(PDFFilename)
-    val documentPDF: PDDocument = PDDocument.load(PDFFile)
+fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>){
+    val pdfFile = File(PDFFilename)
+    val documentPDF: PDDocument = PDDocument.load(pdfFile)
     val pdfNumberOfPages = documentPDF.getNumberOfPages()
     println("Number of pages: " + pdfNumberOfPages)
 
     // Find the first instance of each vocabulary word
     try {
         vocabComponentArray.forEachIndexed { index, currentVocabComponent ->
-            var pageCounter: Int = 1 // start at page 1 for each vocab Hanzi
-            var pdfPageText: String = ""
-//          println("Hanzi to find: " + currentVocabHanzi[0])
+            var pageCounter = 1 // start at page 1 for each vocab Hanzi
+            var pdfPageText = ""
 
             while(!pdfPageText.contains(currentVocabComponent[0])) {
                 val stripper = PDFTextStripper()
@@ -29,13 +28,10 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
                 stripper.endPage = pageCounter
                 pdfPageText = stripper.getText(documentPDF)
 
-//              println("pdfPageText: " + pdfPageText)
-
                 if (pdfPageText.contains(currentVocabComponent[0])){
-//                    println("Hanzi " + currentVocabComponent[0] + " - found in page " + pageCounter)
-                    currentVocabComponent.add(Integer.toString(pageCounter))  // add the first occurrence of vocab to vocab element array
+                    currentVocabComponent.add(Integer.toString(pageCounter))
                 }
-                pageCounter +=1 // prepare to look at next page
+                pageCounter +=1
             }
         }
     }
@@ -43,9 +39,8 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
 
     // Get the first sentence of each page, and save to array
     try {
-
-        var pdfPageText: String = ""
-        var pageCounter: Int = 2 // start at page 1
+        var pdfPageText = ""
+        var pageCounter = 2 // start where the story starts (accounting for title page)
         while (pageCounter<pdfNumberOfPages) { // for each page
             val stripper = PDFTextStripper()
             stripper.startPage = pageCounter
@@ -53,15 +48,12 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
             pdfPageText = stripper.getText(documentPDF)
 
             var pdfPageTextLines: List<String> = pdfPageText.split("\r\n") //   \r   vs   \n   vs   \r\n    ..?
-//            println("pdfPageTextLines (first line on page " + pageCounter +"):" + pdfPageTextLines[0])  // DEBUGGING
 
-            pdfPageFirstSentences.add(pdfPageTextLines[0])
-//            println("pdfPageFirstSentences: " + pdfPageFirstSentences)
-            pageCounter +=1 // prepare to look at next page
+            pdfPageFirstSentences.add(pdfPageTextLines[0]) // todo improve efficiency; only need 1 (of maybe 20 lines)
+            pageCounter +=1
         }
     }
-    catch(e: Exception){    }
-
+    catch(e: Exception){}
     documentPDF.close()
 }
 

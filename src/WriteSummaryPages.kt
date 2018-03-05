@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import java.util.ArrayList
 
 
-fun writeVocabPage(outputStoryWriter: PrintWriter, inputVocabFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>){
+fun writeVocabSection(outputStoryWriter: PrintWriter, inputVocabFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>){
     // add page title, remove indenting
     outputStoryWriter.println("\\clearpage")
     outputStoryWriter.println("\\setlength{\\parindent}{0ex}")
@@ -16,6 +16,5 @@ fun writeVocabPage(outputStoryWriter: PrintWriter, inputVocabFilename: String, v
     }
 }
 
-// TODO fun writeTexGrammar
-
-// todo add table of contents to template, so code can be used to "fill it out"
+// TODO fun writeTeXGrammarSection
+// TODO fun writeTeXQuestionsSection

@@ -7,9 +7,9 @@ import java.util.*
 fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayList<String>, texLinesPDFPageFirstSentence: ArrayList<Int>){
     println("pdfPageFirstSentences: " + pdfPageFirstSentences)
     pdfPageFirstSentences.forEachIndexed { index, pdfPageFirstSentence ->
-        val inputFile: File = File(outputStoryFilename) // get file ready
-        val scan: Scanner = Scanner(inputFile)
-        var lineCount: Int = 0
+        val inputFile = File(outputStoryFilename) // get file ready
+        val scan = Scanner(inputFile)
+        var lineCount = 0
 
         while (scan.hasNextLine()) {                              // TODO stop scanning when the first occurance is met
             val line: String = scan.nextLine()
@@ -23,8 +23,8 @@ fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayLi
 }
 
 fun copyToTex(outputStoryWriter: PrintWriter, inputFilename: String){
-    val inputFile: File = File(inputFilename) // get file ready
-    val scan: Scanner = Scanner(inputFile)
+    val inputFile = File(inputFilename)
+    val scan = Scanner(inputFile)
 
     while(scan.hasNextLine()) {
         val line: String = scan.nextLine() // read all lines
