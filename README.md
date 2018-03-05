@@ -21,7 +21,7 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
 3. Get [MiKTeX](https://miktex.org/download), and install. I chose "Install missing package on the fly.".
 
-4. In IDEA, "check out from version control" -> Github -> login -> repo URL "https://github.com/IdiosApps/Graded-Reader-Builder.git"
+4. In IDEA, "check out from version control" -> Github -> login -> repo URL "https://github.com/YOUR-USERNAME/Graded-Reader-Builder.git"
 
 5. In IDEA, click on Graded-Reader-Builder/src/main.kt (at the top left). IDEA will say "Project SDK not defined", so you need to get the java SDK.
 
