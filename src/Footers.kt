@@ -6,66 +6,85 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-// TODO tidy up, and get it working properly!
-
-fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageFirstSentence: ArrayList<Int>){
+fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageFirstSentence: ArrayList<Int>,languageUsed: String, pdfNumberOfPages: Int){
     var pageNumber = 2
     val outputStoryFile = File(outputStoryFilename)
-    var rightFooter = StringBuilder("\\rfoot{ ")// .append(c).append(d) // .toString()
-    var leftFooter = StringBuilder("\\lfoot{ ")// .append(c).append(d) // .toString()
 
     VocabUtils.getVocabIndicies(vocabComponentArray) // add vocab "order of appearance" index
 
-    generateFooters(vocabComponentArray,pageNumber,leftFooter,rightFooter)
-    println("leftFooter: " + leftFooter)
-    println("rightFooter: " + rightFooter)
+    var languageMarker = LanguageUtils.prefixLaTeXLanguageMarker(languageUsed)
+    val texPath = Paths.get(outputStoryFilename)
+    val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
+    var trackTexLinesAdded = 0
 
-    texLinesPDFPageFirstSentence.forEachIndexed { index, texLineForPageBegin ->
-        val texPath = Paths.get(outputStoryFilename)
-        val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
-        lines.add(texLineForPageBegin + 1, leftFooter.toString())
-        lines.add(texLineForPageBegin + 2, rightFooter.toString())
-        Files.write(texPath, lines, StandardCharsets.UTF_8)
+    while (pageNumber < pdfNumberOfPages) {
+        println("pageNumber, pdfNumberOfPages" + pageNumber + pdfNumberOfPages)
+        var rightFooter = StringBuilder("\\rfoot{ ")
+        var leftFooter = StringBuilder("\\lfoot{ ")
+        generateFooters(vocabComponentArray, pageNumber, leftFooter, rightFooter, languageMarker)
+
+            lines.add(texLinesPDFPageFirstSentence[pageNumber-2]+ 1 + trackTexLinesAdded, leftFooter.toString())
+            lines.add(texLinesPDFPageFirstSentence[pageNumber-2] + 2 + trackTexLinesAdded, rightFooter.toString())
+        trackTexLinesAdded +=2 // see if this is neccesary. Think it is (for 10 page+ books).
+        pageNumber +=1
     }
+    Files.write(texPath, lines, StandardCharsets.UTF_8)
 }
 
-fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int, leftFooter: StringBuilder, rightFooter: StringBuilder){
-    var pagesVocab: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
-    var FooterCounter = 0
 
-    // get vocab used in current page
+fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int, leftFooter: StringBuilder, rightFooter: StringBuilder,languageMarker: String){
+    // generate a footer for a given pageNumber
+    var pagesVocab: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
+    var vocabInFooterIndex = 0
+
+    // store any vocabulary that's on this page, from all the vocab.
     vocabComponentArray.forEachIndexed { index, currentVocab ->
-        if(Integer.parseInt(currentVocab[3]) ==pageNumber){
+        if(Integer.parseInt(currentVocab[currentVocab.size-2]) == pageNumber){ // last component of CurrentVocab is the index, 2nd from last is page number.
             pagesVocab.add(currentVocab)
         }
     }
 
-    // example of TeX footers:
-    //    \lfoot{	x. 对她说 (\pinyin{dui4ta1shuo1}) said to her\\ 	x. 啊 (\pinyin{a1}) who knows..\\ 	x. 聪明 (\pinyin{cong1ming}) intelligent\\ }
-    //    \rfoot{ x. 比如 (\pinyin{bi3ru2}) for example\\        x. 再问 (\pinyin{zai4wen4}) ask again\\	x. 谁知道 (\pinyin{shei2zhi1dao}） who knows..?\\ }
-    if ((pagesVocab.size % 2)==0) {   // even number of vocab on page
-        while (FooterCounter<(pagesVocab.size/2)){
-            leftFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
-            FooterCounter+=1
+    // vocabulary might have 4 or 5+ components - "appendFooterParts" deals with that (passes to 4/5 vocab part functions, depending)
+    // two "if {while/while}" sections deal out vocab to left/right footers
+    if ((pagesVocab.size % 2)==0) {    // left/right footers have 50/50 vocab
+        while (vocabInFooterIndex<(pagesVocab.size/2)){ // left (even)
+            appendFooterParts (leftFooter,pagesVocab, vocabInFooterIndex, languageMarker)
+            vocabInFooterIndex ++
         }
-        while (FooterCounter<(pagesVocab.size)){
-            rightFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
-            FooterCounter+=1
+        while (vocabInFooterIndex<(pagesVocab.size)){  // right (even)
+            appendFooterParts (rightFooter,pagesVocab, vocabInFooterIndex, languageMarker)
+            vocabInFooterIndex ++
         }
     }
-    else {  // odd number of vocab on page
-        while (FooterCounter<(((pagesVocab.size)+1)/2)){ // e.g. 2 left, 1 right
-            leftFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
-            FooterCounter+=1
+    else {  // left footer has an extra vocab
+        while (vocabInFooterIndex<(((pagesVocab.size)+1)/2)){ // left (odd)
+            appendFooterParts (leftFooter,pagesVocab, vocabInFooterIndex, languageMarker)
+            vocabInFooterIndex ++
         }
-        while (FooterCounter<(pagesVocab.size)){ // rfoot takes what's left of the page's vocab
-            rightFooter.append(Integer.parseInt(pagesVocab[FooterCounter][4]) +1).append(". ").append(pagesVocab[FooterCounter][0]).append(" (\\pinyin{").append(pagesVocab[FooterCounter][1]).append("}) ").append(pagesVocab[FooterCounter][2]).append("\\\\ ")
-            FooterCounter+=1
+        while (vocabInFooterIndex<(pagesVocab.size)){ // right (odd)
+            appendFooterParts (rightFooter,pagesVocab, vocabInFooterIndex, languageMarker)
+            vocabInFooterIndex ++
         }
     }
     leftFooter.append("}")
     rightFooter.append("}")
 }
 
+// check how many parts are provided for vocabulary, then pass to appendFooter2/3+Parts
+fun appendFooterParts (footerToBuild: StringBuilder, pagesVocab: ArrayList<ArrayList<String>>, vocabInFooterIndex: Int, languageMarker: String){
+    if (pagesVocab[0].size == 4) {
+        appendFooterTwoPartsHanEn(footerToBuild, pagesVocab, vocabInFooterIndex, languageMarker)
+    }
+        else if (pagesVocab[0].size == 5 ) {
+        appendFooterThreePartsHanPinEn (footerToBuild, pagesVocab, vocabInFooterIndex, languageMarker)
+    }
+}
 
-
+// First add the vocabulary index, then e.g. hanzi then english
+fun appendFooterTwoPartsHanEn (footerToBuild: StringBuilder,pagesVocab: ArrayList<ArrayList<String>> ,vocabInFooterIndex: Int, languageMarker: String) {
+    footerToBuild.append(Integer.parseInt(pagesVocab[vocabInFooterIndex][pagesVocab[0].size-1]) +1).append(". ").append(pagesVocab[vocabInFooterIndex][0]).append(" ").append(pagesVocab[vocabInFooterIndex][1]).append("\\\\ ")
+}
+// First add the vocabulary index, then e.g. hanzi (0), then pinyin (1) then english (2)
+fun appendFooterThreePartsHanPinEn (footerToBuild: StringBuilder,pagesVocab: ArrayList<ArrayList<String>> ,vocabInFooterIndex: Int, languageMarker: String) {
+    footerToBuild.append(Integer.parseInt(pagesVocab[vocabInFooterIndex][pagesVocab[0].size-1]) +1).append(". ").append(pagesVocab[vocabInFooterIndex][0]).append(" ").append(languageMarker).append(pagesVocab[vocabInFooterIndex][1]).append("}) ").append(pagesVocab[vocabInFooterIndex][2]).append("\\\\ ")
+}

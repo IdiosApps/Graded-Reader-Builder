@@ -10,10 +10,16 @@ fun xelatexToPDF (outputStoryFilename: String){
         val exitVal = process.waitFor()
     }
 
-fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>){
+fun getNumberOfPDFPages (PDFFilename: String, pdfNumberOfPages: Int) : Int {
     val pdfFile = File(PDFFilename)
     val documentPDF: PDDocument = PDDocument.load(pdfFile)
-    val pdfNumberOfPages = documentPDF.getNumberOfPages()
+    var pdfNumberOfPages = documentPDF.getNumberOfPages()
+    return pdfNumberOfPages
+}
+
+fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>, pdfNumberOfPages: Int){
+    val pdfFile = File(PDFFilename)
+    val documentPDF: PDDocument = PDDocument.load(pdfFile)
     println("Number of pages: " + pdfNumberOfPages)
 
     // Find the first instance of each vocabulary word

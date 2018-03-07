@@ -8,19 +8,26 @@ fun main(args: Array<String>) {
     // 2: Read pdf to get the first line on each page - this lets us locate this text in TeX and apply footers to the right page!
     // 3: Use page numbers to update LaTeX; convert LaTeX to pdf.
 
-    val filenames = Filenames() // load defaults from class
+    // TODO add multi-language support (could be a bit in the case that both L2 and L1 are used in the story.
+    // If only L2 is used in the story (or if e.g. \arabictext{} doesn't get upset by e.g. some English)...
+    // + then the story can simply be wrapped in \arabictext{}.
+    // otherwise, solve this problem at the end of the text (before final pdf creation) by opening and closing languages appropriately.
 
-    var vocabArray: ArrayList<String> = ArrayList<String>() // This is a list of all the input vocabulary
+    var languageUsed = "mandarin"
+
+    val filenames = Filenames() // load defaults from class
+    var pdfNumberOfPages = 0
+
+    var vocabArray: ArrayList<String> = ArrayList() // This is a list of all the input vocabulary
     var vocabComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>() // This an [array of [arrays containing input vocab split into parts]]
-    var keyNameArray: ArrayList<String> = ArrayList<String>()
+    var keyNameArray: ArrayList<String> = ArrayList()
     var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>() // This an [array of [arrays containing input key names split into parts]]
-    var pdfPageFirstSentences: ArrayList<String> = ArrayList<String>()
-    var texLinesPDFPageFirstSentence: ArrayList<Int> = ArrayList<Int>()
-    var pdfNumberOfPages = 0 // todo tidy this up (return of pdf reading method?)
+    var pdfPageFirstSentences: ArrayList<String> = ArrayList()
+    var texLinesPDFPageFirstSentence: ArrayList<Int> = ArrayList()
 
     val outputStoryTeXWriter = PrintWriter(filenames.outputStoryFilename, "UTF-8")
 
-    VocabUtils.splitVocabIntoParts(filenames.inputVocabFilename, vocabArray, vocabComponentArray) // split vocab into e.g. [hanzi,pinyin,english]
+    VocabUtils.splitVocabIntoParts(filenames.inputVocabFilename, vocabArray, vocabComponentArray)
     VocabUtils.splitVocabIntoParts(filenames.inputKeyNamesFilename, keyNameArray, keyNameComponentArray)
 
     TexUtils.copyToTex(outputStoryTeXWriter, filenames.inputHeaderFilename)
@@ -35,13 +42,14 @@ fun main(args: Array<String>) {
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
 
-    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageFirstSentences)
+    pdfNumberOfPages = PDFUtils.getNumberOfPDFPages(filenames.outputPDFFilename, pdfNumberOfPages)
+    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageFirstSentences,pdfNumberOfPages)
     TexUtils.getTexLineNumber(filenames.outputStoryFilename, pdfPageFirstSentences, texLinesPDFPageFirstSentence)
 
     TeXStyling.addStyling(vocabComponentArray, filenames.outputStoryFilename, "superscript")
     TeXStyling.addStyling(keyNameComponentArray, filenames.outputStoryFilename, "underline")
 
-    Footers.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentence)
+    Footers.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentence, languageUsed,pdfNumberOfPages)
     outputStoryTeXWriter.close()
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)

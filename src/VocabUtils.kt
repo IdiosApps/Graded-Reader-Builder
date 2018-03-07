@@ -10,7 +10,6 @@ fun getVocabIndicies(vocabComponentArray: ArrayList<ArrayList<String>>){
 }
 
 fun splitVocabIntoParts(inputFilename: String, inputArray: ArrayList<String>, inputComponentArray: ArrayList<ArrayList<String>>){
-println("Trying to split vocab")
     val inputFile = File(inputFilename)
     val scan = Scanner(inputFile)
     var vocabIndex = 0
@@ -22,7 +21,6 @@ println("Trying to split vocab")
         while (vocabLine.contains("|")){
             vocabSplitParts.add(vocabLine.substring(0, vocabLine.indexOf("|")))
             vocabLine = vocabLine.substring(vocabLine.indexOf("|")+1, vocabLine.length)
-            println(vocabLine)
         }
         vocabSplitParts.add(vocabLine.substring(0, vocabLine.length)) // add the part after the last |
 

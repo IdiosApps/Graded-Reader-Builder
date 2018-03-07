@@ -16,9 +16,15 @@ fun addStyling(inputArray: ArrayList<ArrayList<String>>, outputStoryFilename: St
         if (markupType=="underline"){
             content = content.replace(inputArrayElement[0].toRegex(), "\\\\uline{" + inputArrayElement[0] + "}")
         }
-        else if (markupType=="superscript"){
-            var firstVocabOccurance: Int = Integer.parseInt(inputArrayElement[3]) -1 //-1 because of title page
-            content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + firstVocabOccurance + "." + (index+1) + "}")
+        else if (markupType=="superscript") {
+            // TODO make input vocab size-dependency cleaner.
+            if (inputArrayElement.size == 3) { // for Hanzi,En,index, size is 3.
+                var firstVocabOccurance: Int = Integer.parseInt(inputArrayElement[2]) - 1 //-1 because of title page
+                content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + firstVocabOccurance + "." + (index + 1) + "}")
+            } else if (inputArrayElement.size == 4) {  // for Hanzi,Pinyin,En,index, size is 4.
+                var firstVocabOccurance: Int = Integer.parseInt(inputArrayElement[3]) - 1 //-1 because of title page
+                content = content.replace(inputArrayElement[0].toRegex(), inputArrayElement[0] + "\\\\textsuperscript{" + firstVocabOccurance + "." + (index + 1) + "}")
+            }
         }
     }
     Files.write(path, content.toByteArray(charset))
