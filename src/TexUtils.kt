@@ -4,22 +4,29 @@ import java.io.File
 import java.io.PrintWriter
 import java.util.*
 
-fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayList<String>, texLinesPDFPageFirstSentence: ArrayList<Int>){
-    println("pdfPageFirstSentences: " + pdfPageFirstSentences)
-    pdfPageFirstSentences.forEachIndexed { index, pdfPageFirstSentence ->
-        val inputFile = File(outputStoryFilename) // get file ready
-        val scan = Scanner(inputFile)
-        var lineCount = 0
+fun getTexLineNumber(outputStoryFilename: String, pdfPageFirstSentences: ArrayList<String>, texLinesPDFPageFirstSentence: ArrayList<Int>) {
+    val inputFile = File(outputStoryFilename) // get file ready
+    val scan = Scanner(inputFile)
+    var pdfPageFirstSentenceIndexer = 0
+    var lineCount = 1
 
-        while (scan.hasNextLine()) {                              // TODO stop scanning when the first occurance is met
-            val line: String = scan.nextLine()
-            if (line.contains(pdfPageFirstSentence)) {
-                texLinesPDFPageFirstSentence.add(lineCount+1)
-            }
-            lineCount+=1
+    //  TODO figure out why line.contains is failing to find a match for the 2nd page, when it really seems like there should be a match!
+    while (scan.hasNextLine()) {
+        var line: String = scan.nextLine()
+        if (line.contains(pdfPageFirstSentences[pdfPageFirstSentenceIndexer])) {
+            texLinesPDFPageFirstSentence.add(lineCount)
+            pdfPageFirstSentenceIndexer++
         }
-        scan.close()
+        if (line.contains("code (on Github). It's that simple.")){
+            println("at line " + lineCount)
+            println("Line:" + line)
+        }
+        if (lineCount == 96){
+            println("pdfPageFirstSentences[pdfPageFirstSentenceIndexer]: " + pdfPageFirstSentences[pdfPageFirstSentenceIndexer])
+        }
+        lineCount++
     }
+    scan.close()
 }
 
 fun copyToTex(outputStoryWriter: PrintWriter, inputFilename: String){

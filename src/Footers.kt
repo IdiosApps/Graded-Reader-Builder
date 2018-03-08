@@ -18,7 +18,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     var trackTexLinesAdded = 0
 
     while (pageNumber < pdfNumberOfPages) {
-        println("pageNumber, pdfNumberOfPages" + pageNumber + pdfNumberOfPages)
+        println("pageNumber, pdfNumberOfPages" + pageNumber + ", " +pdfNumberOfPages)
         var rightFooter = StringBuilder("\\rfoot{ ")
         var leftFooter = StringBuilder("\\lfoot{ ")
         generateFooters(vocabComponentArray, pageNumber, leftFooter, rightFooter, languageMarker)
