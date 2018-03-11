@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     var keyNameArray: ArrayList<String> = ArrayList()
     var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>() // This an [array of [arrays containing input key names split into parts]]
     var pdfPageFirstSentences: ArrayList<String> = ArrayList()
-    var texLinesPDFPageFirstSentence: ArrayList<Int> = ArrayList()
+    var texLinesPDFPageFirstSentences: ArrayList<Int> = ArrayList()
 
     val outputStoryTeXWriter = PrintWriter(filenames.outputStoryFilename, "UTF-8")
 
@@ -44,12 +44,12 @@ fun main(args: Array<String>) {
 
     pdfNumberOfPages = PDFUtils.getNumberOfPDFPages(filenames.outputPDFFilename, pdfNumberOfPages)
     PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageFirstSentences,pdfNumberOfPages)
-    TexUtils.getTexLineNumber(filenames.outputStoryFilename, pdfPageFirstSentences, texLinesPDFPageFirstSentence)
+    TexUtils.getTexLineNumbers(filenames.outputStoryFilename, pdfPageFirstSentences, texLinesPDFPageFirstSentences)
 
     TeXStyling.addStyling(vocabComponentArray, filenames.outputStoryFilename, "superscript")
     TeXStyling.addStyling(keyNameComponentArray, filenames.outputStoryFilename, "underline")
 
-    Footers.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentence, languageUsed,pdfNumberOfPages)
+    Footers.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentences, languageUsed,pdfNumberOfPages)
     outputStoryTeXWriter.close()
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)

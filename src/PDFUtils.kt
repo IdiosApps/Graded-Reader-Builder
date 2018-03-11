@@ -17,10 +17,10 @@ fun getNumberOfPDFPages (PDFFilename: String, pdfNumberOfPages: Int) : Int {
     return pdfNumberOfPages
 }
 
+// TODO split this into two functions: one for vocab pages, one for first sentences on pages.
 fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>, pdfNumberOfPages: Int){
     val pdfFile = File(PDFFilename)
     val documentPDF: PDDocument = PDDocument.load(pdfFile)
-    println("Number of pages: " + pdfNumberOfPages)
 
     // Find the first instance of each vocabulary word
     try {
@@ -49,13 +49,15 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
         var pageCounter = 2 // start where the story starts (accounting for title page)
         while (pageCounter<pdfNumberOfPages) { // for each page
             val stripper = PDFTextStripper()
+            var pdfPageFirstLine = ""
             stripper.startPage = pageCounter
             stripper.endPage = pageCounter
             pdfPageText = stripper.getText(documentPDF)
 
             var pdfPageTextLines: List<String> = pdfPageText.split("\r\n") //   \r   vs   \n   vs   \r\n    ..?
 
-            pdfPageFirstSentences.add(pdfPageTextLines[0]) // todo improve efficiency; only need 1 (of maybe 20 lines)
+            pdfPageFirstLine = fixPDFPageFirstLine(pdfPageTextLines[0])
+            pdfPageFirstSentences.add(pdfPageFirstLine) // todo improve efficiency; only need 1 (of maybe 20 lines)
             pageCounter +=1
         }
     }
@@ -63,3 +65,35 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
     documentPDF.close()
 }
 
+fun fixPDFPageFirstLine (pdfPageFirstTextLine: String): String {
+    // Convert string to charArray (easier manipulation; String is immutable)
+    var lineAsChars = pdfPageFirstTextLine.toCharArray()
+
+    // Scan through for 8217 and turn it into 39'
+    // note: a 39' was converted to 25,32 (2 chars) at first. later just 8217
+    // This fixes ' being misread
+    var characterIndex = 0
+    while (characterIndex < lineAsChars.size) {
+
+        if (lineAsChars[characterIndex].toInt() == 8217) {
+            lineAsChars[characterIndex] = 39.toChar()
+        }
+        characterIndex++
+    }
+
+    // Then just scan through and remove the 0s
+    // this fixes an ascii/unicode mix-up (I think).
+    // this stopped appearing the same time 25,32->8217. Not sure why.
+    var cleanedString: StringBuilder = StringBuilder()
+    var characterIndexForZeroes = 0
+
+    while (characterIndexForZeroes < lineAsChars.size) {
+        if (lineAsChars[characterIndexForZeroes].toInt() == 0) {
+        } // don't do anything if the char has Int value of 0
+        else { // add every character to stringbuilder
+            cleanedString.append(lineAsChars[characterIndexForZeroes])
+        }
+        characterIndexForZeroes++
+    }
+    return cleanedString.toString()
+}
