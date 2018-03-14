@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
     TeXStyling.addStyling(vocabComponentArray, filenames.outputStoryFilename, "superscript")
     TeXStyling.addStyling(keyNameComponentArray, filenames.outputStoryFilename, "underline")
 
-    Footers.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentences, languageUsed,pdfNumberOfPages)
+    FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentences, languageUsed,pdfNumberOfPages)
     outputStoryTeXWriter.close()
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
