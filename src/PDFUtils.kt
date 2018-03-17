@@ -17,8 +17,8 @@ fun getNumberOfPDFPages (PDFFilename: String, pdfNumberOfPages: Int) : Int {
     return pdfNumberOfPages
 }
 
-// TODO split this into two functions: one for vocab pages, one for first sentences on pages.
-fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageFirstSentences: ArrayList<String>, pdfNumberOfPages: Int){
+// TODO split this into two functions: one for vocab pages, one for last sentences on pages.
+fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageLastSentences: ArrayList<String>, pdfNumberOfPages: Int){
     val pdfFile = File(PDFFilename)
     val documentPDF: PDDocument = PDDocument.load(pdfFile)
 
@@ -43,21 +43,22 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
     }
     catch(e: Exception){    }
 
-    // Get the first sentence of each page, and save to array
+    // Get the last sentence of each page, and save to array
     try {
         var pdfPageText = ""
         var pageCounter = 2 // start where the story starts (accounting for title page)
         while (pageCounter<pdfNumberOfPages) { // for each page
             val stripper = PDFTextStripper()
-            var pdfPageFirstLine = ""
+            var pdfPageLastLine = ""
             stripper.startPage = pageCounter
             stripper.endPage = pageCounter
             pdfPageText = stripper.getText(documentPDF)
 
             var pdfPageTextLines: List<String> = pdfPageText.split("\r\n") //   \r   vs   \n   vs   \r\n    ..?
 
-            pdfPageFirstLine = fixPDFPageFirstLine(pdfPageTextLines[0])
-            pdfPageFirstSentences.add(pdfPageFirstLine) // todo improve efficiency; only need 1 (of maybe 20 lines)
+            pdfPageLastLine = fixPDFPageLastLine(pdfPageTextLines[pdfPageTextLines.size-3]) // TODO make sure this is safe. last line is page number.
+            // 2nd from last line is a blank. 3rd from last line is the last text line.
+            pdfPageLastSentences.add(pdfPageLastLine) // todo improve efficiency; only need 1 (of maybe 20 lines)
             pageCounter +=1
         }
     }
@@ -65,9 +66,9 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
     documentPDF.close()
 }
 
-fun fixPDFPageFirstLine (pdfPageFirstTextLine: String): String {
+fun fixPDFPageLastLine (pdfPageLastTextLine: String): String {
     // Convert string to charArray (easier manipulation; String is immutable)
-    var lineAsChars = pdfPageFirstTextLine.toCharArray()
+    var lineAsChars = pdfPageLastTextLine.toCharArray()
 
     // Scan through for 8217 and turn it into 39'
     // note: a 39' was converted to 25,32 (2 chars) at first. later just 8217

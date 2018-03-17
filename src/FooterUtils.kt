@@ -6,44 +6,43 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
 
-fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageLastSentence: ArrayList<Int>,languageUsed: String, pdfNumberOfPages: Int){
+fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageLastSentence: ArrayList<Int>,languageUsed: String, pdfNumberOfPages: Int, texLinesLastSentenceIndex: ArrayList<Int>, pdfPageLastSentences: ArrayList<String>){
     var pageNumber = 2
     val outputStoryFile = File(outputStoryFilename)
     var footers = Footers()
-
 
     VocabUtils.getVocabIndicies(vocabComponentArray) // add vocab "order of appearance" index // todo create this automatically.
 
     var languageMarker = LanguageUtils.prefixLaTeXLanguageMarker(languageUsed)
     val texPath = Paths.get(outputStoryFilename)
     val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
-    var trackTexLinesAdded = 0
 
     while (pageNumber < pdfNumberOfPages) {
-        println("pageNumber, pdfNumberOfPages" + pageNumber + ", " +pdfNumberOfPages)
-        var rightFooter = StringBuilder("\\rfoot{ ")
-        var leftFooter = StringBuilder("\\lfoot{ ")
-        generateFooters(vocabComponentArray, pageNumber, leftFooter, rightFooter, languageMarker)
+        generateFooters(vocabComponentArray, pageNumber, languageMarker, footers)
 
-        // store the footers, and add footer-callers (and page-endings) to the ends of pages
-        footers.lfoots.add(leftFooter.toString())
-        footers.rfoots.add(rightFooter.toString())
-        var footerCallText: String = " \\thispagestyle{f"+pageNumber+"}\\clearpage "
-        // TODO add footerCallText specifically at pdf's-last-line[indexOf(pdf's-last-line)+ pdf's-last-line.length]
-        lines.add(texLinesPDFPageLastSentence[pageNumber-2]+ 1 + trackTexLinesAdded, footerCallText)
-        trackTexLinesAdded ++ // see if this is neccesary. Think it is (for 10 page+ books).
+        var footerCallText: String = "\\thispagestyle{f"+(pageNumber-1)+"}\\clearpage"
+
+        var lineToChange = lines[texLinesPDFPageLastSentence[pageNumber-2]]
+
+        var lineWithReference = lineToChange.substring(0, texLinesLastSentenceIndex[pageNumber-2] + pdfPageLastSentences[pageNumber-2].length) +
+                                footerCallText +
+                                lineToChange.substring((texLinesLastSentenceIndex[pageNumber-2] + pdfPageLastSentences[pageNumber-2].length), lineToChange.length)
+
+        lines[texLinesPDFPageLastSentence[pageNumber-2]] = lineWithReference
         pageNumber ++
     }
-    addFooterContentSection(outputStoryFilename,footers)
+    addFooterContentSection(outputStoryFilename,footers) // footer references need a list of footer contents
     Files.write(texPath, lines, StandardCharsets.UTF_8)
 }
 
-
-fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int, leftFooter: StringBuilder, rightFooter: StringBuilder,languageMarker: String){
+fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int,languageMarker: String, footers: Footers){
     // generate a footer for a given pageNumber
     var pagesVocab: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
     var vocabInFooterIndex = 0
+    var leftFooter = StringBuilder()
+    var rightFooter = StringBuilder()
 
     // store any vocabulary that's on this page, from all the vocab.
     vocabComponentArray.forEachIndexed { index, currentVocab ->
@@ -75,6 +74,8 @@ fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumbe
     }
     leftFooter.append("}")
     rightFooter.append("}")
+    footers.lfoots.add(leftFooter.toString())
+    footers.rfoots.add(rightFooter.toString())
 }
 
 // check how many parts are provided for vocabulary, then pass to appendFooter2/3+Parts
@@ -97,6 +98,7 @@ fun appendFooterThreePartsHanPinEn (footerToBuild: StringBuilder,pagesVocab: Arr
 }
 
 fun addFooterContentSection(outputStoryFilename: String, footers: Footers) {
+    // do this with Files.readAllLines, or scanning line-by-line?
     val texPath = Paths.get(outputStoryFilename)
     val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
     var beginIndex = lines.indexOf("% Begin Document")

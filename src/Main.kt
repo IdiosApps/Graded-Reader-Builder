@@ -22,8 +22,9 @@ fun main(args: Array<String>) {
     var vocabComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>() // This an [array of [arrays containing input vocab split into parts]]
     var keyNameArray: ArrayList<String> = ArrayList()
     var keyNameComponentArray: ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>() // This an [array of [arrays containing input key names split into parts]]
-    var pdfPageFirstSentences: ArrayList<String> = ArrayList()
-    var texLinesPDFPageFirstSentences: ArrayList<Int> = ArrayList()
+    var pdfPageLastSentences: ArrayList<String> = ArrayList()
+    var texLinesPDFPageLastSentences: ArrayList<Int> = ArrayList()
+    var texLinesLastSentenceIndex: ArrayList<Int> = ArrayList()
 
     val outputStoryTeXWriter = PrintWriter(filenames.outputStoryFilename, "UTF-8")
 
@@ -43,13 +44,13 @@ fun main(args: Array<String>) {
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
 
     pdfNumberOfPages = PDFUtils.getNumberOfPDFPages(filenames.outputPDFFilename, pdfNumberOfPages)
-    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageFirstSentences,pdfNumberOfPages)
-    TexUtils.getTexLineNumbers(filenames.outputStoryFilename, pdfPageFirstSentences, texLinesPDFPageFirstSentences)
+    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageLastSentences,pdfNumberOfPages)
+    TexUtils.getTexLineNumbers(filenames.outputStoryFilename, pdfPageLastSentences, texLinesPDFPageLastSentences, texLinesLastSentenceIndex)
 
     TeXStyling.addStyling(vocabComponentArray, filenames.outputStoryFilename, "superscript")
     TeXStyling.addStyling(keyNameComponentArray, filenames.outputStoryFilename, "underline")
 
-    FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageFirstSentences, languageUsed,pdfNumberOfPages)
+    FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageLastSentences, languageUsed,pdfNumberOfPages, texLinesLastSentenceIndex,pdfPageLastSentences)
     outputStoryTeXWriter.close()
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
