@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageLastSentence: ArrayList<Int>,languageUsed: String, pdfNumberOfPages: Int, texLinesLastSentenceIndex: ArrayList<Int>, pdfPageLastSentences: ArrayList<String>){
@@ -22,19 +23,41 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     while (pageNumber < pdfNumberOfPages) {
         generateFooters(vocabComponentArray, pageNumber, languageMarker, footers)
 
-        var footerCallText: String = "\\thispagestyle{f"+(pageNumber-1)+"}\\clearpage"
+        var footerCallText: String = " \\thispagestyle{f"+(pageNumber-1)+"}\\clearpage "
 
         var lineToChange = lines[texLinesPDFPageLastSentence[pageNumber-2]]
+        var lineWithReference = ""
 
-        var lineWithReference = lineToChange.substring(0, texLinesLastSentenceIndex[pageNumber-2] + pdfPageLastSentences[pageNumber-2].length) +
-                                footerCallText +
-                                lineToChange.substring((texLinesLastSentenceIndex[pageNumber-2] + pdfPageLastSentences[pageNumber-2].length), lineToChange.length)
+//        Say I have 7 characters in the pdf
+//        你好。你好吗？
+//        -> addStyling
+//        你好\superscript{1.1}。你好吗\superscript{1.2}？
+//
+//        I want to be ending the page not after the 7th character, but at the  (7+ "\superscript{1.1}".length + "\superscript{1.2}".length +1)th character
+        var stylingLength = getStylingLength(lineToChange,pdfPageLastSentences, pageNumber)
+
+        lineWithReference = lineToChange.substring(0, texLinesLastSentenceIndex[pageNumber - 2] + pdfPageLastSentences[pageNumber - 2].length + stylingLength) +
+                footerCallText +
+                lineToChange.substring((texLinesLastSentenceIndex[pageNumber - 2] + pdfPageLastSentences[pageNumber - 2].length + stylingLength), lineToChange.length)
 
         lines[texLinesPDFPageLastSentence[pageNumber-2]] = lineWithReference
         pageNumber ++
     }
     addFooterContentSection(outputStoryFilename,footers) // footer references need a list of footer contents
     Files.write(texPath, lines, StandardCharsets.UTF_8)
+}
+
+fun getStylingLength (lineToChange:String, pdfPageLastSentences: ArrayList<String>, pageNumber: Int): Int{
+    var stylingLength = 0
+    var stylingRegex = "\\\\uline\\{[a-zA-Z\\d]+\\}|\\\\text(super|sub)script\\{[0-9]+.[0-9]+\\}"
+    var lineToChangeLocal = lineToChange
+    while (!(lineToChangeLocal.contains(pdfPageLastSentences[pageNumber-2]))){
+        stylingLength += lineToChangeLocal.length
+        lineToChangeLocal = lineToChangeLocal.replaceFirst(Pattern.quote(stylingRegex), "")
+        println("linetoChangeLocal: " + lineToChangeLocal)
+        stylingLength -= lineToChangeLocal.length
+    }
+    return stylingLength
 }
 
 fun generateFooters(vocabComponentArray: ArrayList<ArrayList<String>>, pageNumber: Int,languageMarker: String, footers: Footers){
