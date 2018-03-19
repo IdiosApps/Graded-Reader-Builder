@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
 fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputStoryFilename: String, texLinesPDFPageLastSentence: ArrayList<Int>,languageUsed: String, pdfNumberOfPages: Int, texLinesLastSentenceIndex: ArrayList<Int>, pdfPageLastSentences: ArrayList<String>){
@@ -28,13 +27,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
         var lineToChange = lines[texLinesPDFPageLastSentence[pageNumber-2]]
         var lineWithReference = ""
 
-//        Say I have 7 characters in the pdf
-//        你好。你好吗？
-//        -> addStyling
-//        你好\superscript{1.1}。你好吗\superscript{1.2}？
-//
-//        I want to be ending the page not after the 7th character, but at the  (7+ "\superscript{1.1}".length + "\superscript{1.2}".length +1)th character
-        var stylingLength = getStylingLength(lineToChange,pdfPageLastSentences, pageNumber)
+        var stylingLength = getStylingLength(lineToChange,pdfPageLastSentences, pageNumber) // styling shifted pdf-line's location in tex; account for this.
 
         lineWithReference = lineToChange.substring(0, texLinesLastSentenceIndex[pageNumber - 2] + pdfPageLastSentences[pageNumber - 2].length + stylingLength) +
                 footerCallText +
@@ -43,18 +36,18 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
         lines[texLinesPDFPageLastSentence[pageNumber-2]] = lineWithReference
         pageNumber ++
     }
-    addFooterContentSection(outputStoryFilename,footers) // footer references need a list of footer contents
     Files.write(texPath, lines, StandardCharsets.UTF_8)
+    addFooterContentSection(outputStoryFilename,footers) // footer references need a list of footer contents
 }
 
 fun getStylingLength (lineToChange:String, pdfPageLastSentences: ArrayList<String>, pageNumber: Int): Int{
     var stylingLength = 0
-    var stylingRegex = "\\\\uline\\{[a-zA-Z\\d]+\\}|\\\\text(super|sub)script\\{[0-9]+.[0-9]+\\}"
+    var stylingRegex = """\\uline\{[a-zA-Z\d]+\}|\\text(super|sub)script\{[0-9]+\.[0-9]+\}"""
     var lineToChangeLocal = lineToChange
+
     while (!(lineToChangeLocal.contains(pdfPageLastSentences[pageNumber-2]))){
         stylingLength += lineToChangeLocal.length
-        lineToChangeLocal = lineToChangeLocal.replaceFirst(Pattern.quote(stylingRegex), "")
-        println("linetoChangeLocal: " + lineToChangeLocal)
+        lineToChangeLocal = lineToChangeLocal.replaceFirst(stylingRegex.toRegex(), "")
         stylingLength -= lineToChangeLocal.length
     }
     return stylingLength
@@ -126,23 +119,42 @@ fun addFooterContentSection(outputStoryFilename: String, footers: Footers) {
     val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
     var beginIndex = lines.indexOf("% Begin Document")
     var footersAddedIndex = 0
+    var totalLinesAdded = 0
+    var linesAdded = 0
 
     while (footersAddedIndex < footers.lfoots.size) {
-        if (footersAddedIndex==0){
-            lines.add(beginIndex-1, "% % Footer 1 % %)")
-            lines.add(beginIndex-1,"\\fancypagestyle{f1}{")
-            lines.add(beginIndex-1,"\\fancyhf{}")
-            lines.add(beginIndex-1,"\\renewcommand{\\headrulewidth}{0pt}") // only have the \renewcommand in the first footer's contents.
-            lines.add(beginIndex-1,footers.lfoots[footersAddedIndex])
-            lines.add(beginIndex-1,footers.rfoots[footersAddedIndex])
+        if (footersAddedIndex == 0) { // first footer contents is a bit special
+            var linesAdded = 0
+            var footerContentsStore = ArrayList<String>()
+            footerContentsStore.addAll(Arrays.asList("% % Footer 1 % %)",
+                    "\\fancypagestyle{f1}{",
+                    "\\fancyhf{}", "\\renewcommand{\\headrulewidth}{0pt}",
+                    "\\lfoot{"+footers.lfoots[footersAddedIndex],
+                    "\\rfoot{"+footers.rfoots[footersAddedIndex],
+                    "}"))
+            while (linesAdded < footerContentsStore.size) {
+                lines.add(beginIndex - 1 + totalLinesAdded, footerContentsStore[linesAdded])
+                totalLinesAdded++
+                linesAdded++
+
+            }
+            footersAddedIndex++
         }
-        else {
-            lines.add(beginIndex-1, "% % Footer "+footersAddedIndex+2+"% %)")
-            lines.add(beginIndex-1,"\\fancypagestyle{f"+footersAddedIndex+2+"}{")
-            lines.add(beginIndex-1,"\\fancyhf{}")
-            lines.add(beginIndex-1,footers.lfoots[footersAddedIndex])
-            lines.add(beginIndex-1,footers.rfoots[footersAddedIndex])
+        if (footersAddedIndex != 0) {
+            var footerContentsStore = ArrayList<String>()
+            footerContentsStore.addAll(Arrays.asList("% % Footer " + (footersAddedIndex+1) + "% %)",
+                    "\\fancypagestyle{f" + (footersAddedIndex+1) + "}{",
+                    "\\fancyhf{}",
+                    "\\lfoot{"+footers.lfoots[footersAddedIndex],
+                    "\\rfoot{"+footers.rfoots[footersAddedIndex],
+                    "}"))
+            while (linesAdded < footerContentsStore.size) {
+                lines.add(beginIndex - 1 + totalLinesAdded, footerContentsStore[linesAdded])
+                totalLinesAdded++
+                linesAdded++
+            }
+            footersAddedIndex++
         }
-        footersAddedIndex++
     }
+    Files.write(texPath, lines, StandardCharsets.UTF_8)
 }

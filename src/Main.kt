@@ -3,15 +3,9 @@ import java.util.*
 
 fun main(args: Array<String>) {
 
-    // Process basically has 3 steps:
-    // 1: Add input text to LaTeX file; convert LaTeX to pdf.
-    // 2: Read pdf to get the first line on each page - this lets us locate this text in TeX and apply footers to the right page!
-    // 3: Use page numbers to update LaTeX; convert LaTeX to pdf.
-
-    // TODO add multi-language support (could be a bit in the case that both L2 and L1 are used in the story.
-    // If only L2 is used in the story (or if e.g. \arabictext{} doesn't get upset by e.g. some English)...
-    // + then the story can simply be wrapped in \arabictext{}.
-    // otherwise, solve this problem at the end of the text (before final pdf creation) by opening and closing languages appropriately.
+    // Process is:
+    // input    ->   tex    ->    pdf    ->    tex     ->    tex     -> pdf
+    //                                     + styling     + footers     final
 
     var languageUsed = "mandarin"
 
