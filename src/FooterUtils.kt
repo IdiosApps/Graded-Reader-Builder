@@ -22,7 +22,7 @@ fun addVocabFooters(vocabComponentArray: ArrayList<ArrayList<String>>, outputSto
     while (pageNumber < pdfNumberOfPages) {
         generateFooters(vocabComponentArray, pageNumber, languageMarker, footers)
 
-        var footerCallText: String = " \\thispagestyle{f"+(pageNumber-1)+"}\\clearpage "
+        var footerCallText: String = " \\thispagestyle{f"+(pageNumber-1)+"}"+"\\clearpage "
 
         var lineToChange = lines[texLinesPDFPageLastSentence[pageNumber-2]]
         var lineWithReference = ""
@@ -117,7 +117,7 @@ fun addFooterContentSection(outputStoryFilename: String, footers: Footers) {
     // do this with Files.readAllLines, or scanning line-by-line?
     val texPath = Paths.get(outputStoryFilename)
     val lines = Files.readAllLines(texPath, StandardCharsets.UTF_8)
-    var beginIndex = lines.indexOf("% Begin Document")
+    var beginIndex = lines.indexOf("% Begin Document") - 1  // so we can place this all before the document begins
     var footersAddedIndex = 0
     var totalLinesAdded = 0
     var linesAdded = 0
@@ -129,27 +129,29 @@ fun addFooterContentSection(outputStoryFilename: String, footers: Footers) {
             footerContentsStore.addAll(Arrays.asList("% % Footer 1 % %)",
                     "\\fancypagestyle{f1}{",
                     "\\fancyhf{}", "\\renewcommand{\\headrulewidth}{0pt}",
+                    "\\cfoot{\\thepage}",
                     "\\lfoot{"+footers.lfoots[footersAddedIndex],
                     "\\rfoot{"+footers.rfoots[footersAddedIndex],
                     "}"))
-            while (linesAdded < footerContentsStore.size) {
-                lines.add(beginIndex - 1 + totalLinesAdded, footerContentsStore[linesAdded])
+            while (linesAdded < footerContentsStore.size) { // add each of the stored lines to tex
+                lines.add(beginIndex + totalLinesAdded, footerContentsStore[linesAdded])
                 totalLinesAdded++
                 linesAdded++
-
             }
-            footersAddedIndex++
+            footersAddedIndex++ // one footer contents (for page 1) has been added.
         }
         if (footersAddedIndex != 0) {
+            var linesAdded = 0
             var footerContentsStore = ArrayList<String>()
-            footerContentsStore.addAll(Arrays.asList("% % Footer " + (footersAddedIndex+1) + "% %)",
+            footerContentsStore.addAll(Arrays.asList("% % Footer " + (footersAddedIndex+1) + "% %",
                     "\\fancypagestyle{f" + (footersAddedIndex+1) + "}{",
                     "\\fancyhf{}",
+                    "\\cfoot{\\thepage}",
                     "\\lfoot{"+footers.lfoots[footersAddedIndex],
                     "\\rfoot{"+footers.rfoots[footersAddedIndex],
                     "}"))
             while (linesAdded < footerContentsStore.size) {
-                lines.add(beginIndex - 1 + totalLinesAdded, footerContentsStore[linesAdded])
+                lines.add(beginIndex + totalLinesAdded, footerContentsStore[linesAdded])
                 totalLinesAdded++
                 linesAdded++
             }
