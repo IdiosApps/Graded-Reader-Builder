@@ -18,7 +18,7 @@
             </JFXButton>
             <JFXComboBox fx:id="myComboBoxL1" layoutX="371.0" layoutY="29.0" onAction="#sendL2" prefHeight="25.0" prefWidth="250.0" promptText="Choose your L2 (target language)" />
             <JFXComboBox fx:id="myComboBoxL2" layoutX="371.0" layoutY="81.0" onAction="#sendL1" prefHeight="25.0" prefWidth="250.0" promptText="Choose your L1 (native language)" />
-            <JFXTextArea editable="false" layoutX="34.0" layoutY="29.0" prefHeight="154.0" prefWidth="250.0" text="Place your input files and GRB.jar in the same folder.&#10;&#10;Inputs:&#10;- Title&#10;- Story&#10;- Vocab&#10;- Key names" />
+            <JFXTextArea fx:id="info" editable="false" layoutX="34.0" layoutY="29.0" prefHeight="154.0" prefWidth="250.0" text="Place your input files and GRB.jar in the same folder.&#10;&#10;Inputs:&#10;- Title&#10;- Story&#10;- Vocab&#10;- Key names" />
             <JFXTextArea fx:id="errorLog" layoutX="373.0" layoutY="183.0" prefHeight="97.0" prefWidth="250.0" />
       </children>
     </AnchorPane>

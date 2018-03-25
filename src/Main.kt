@@ -1,10 +1,12 @@
-import java.io.PrintWriter
+package Main
 
+import java.io.PrintWriter
+import Filenames
      // Process is:
      // input    ->   tex    ->    pdf    ->    tex     ->    tex     -> pdf
      //                                     + styling     + footers     final
 
-fun main(args: Array<String>) {
+fun main(args: ArrayList<String>) {
 
     var languageUsed = "mandarin"
 

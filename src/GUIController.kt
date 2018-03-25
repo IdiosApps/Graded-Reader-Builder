@@ -10,23 +10,25 @@ class GUIController {
     @FXML
     val build: JFXButton? = null
 
-//    @FXML
-//    private val myComboBoxL2: JFXComboBox<*>? = null
-//
-//    @FXML
-//    private val myComboBoxL1: JFXComboBox<*>? = null
-
     @FXML
     val myComboBoxL1: JFXComboBox<Label> = JFXComboBox()
     @FXML
     val myComboBoxL2: JFXComboBox<Label> = JFXComboBox()
 
     @FXML
-    val errorLog: JFXTextArea? = null
+    val errorLog: JFXTextArea = JFXTextArea()
+
+    @FXML
+    val info: JFXTextArea = JFXTextArea()
 
     @FXML
     fun buildGR(event: ActionEvent) {
+        info.setPromptText("Pressed build. This is errorlog.")
+        info.setFocusTraversable(false); // set focus traversable false.
     System.out.println("Button Action");
+        checkXeLaTeX()
+//        var argArray: ArrayList<String> = ArrayList<String>()
+//        Main.main(argArray)
     }
 
     @FXML
@@ -76,9 +78,13 @@ class GUIController {
 //        val myComboBoxL1 = ComboBox(options)
     }
 
-    // Init ComboBox items
-
-
-
-
+    private fun checkXeLaTeX(){
+        errorLog.setPromptText("Checking for xelatex support.")
+        var scanner: java.util.Scanner = java.util.Scanner(Runtime.getRuntime().exec("xelatex").getInputStream()) // .useDelimiter("\\A"
+        var line = scanner.next()
+        var hasXeTeX = (line.contains("This")) // "This is XeTeX, version ....."
+        if (hasXeTeX){errorLog.setPromptText("yay")}
+        else {errorLog.setPromptText("XeTeX not detected. &#10;Download XeTeX here: http://www.texts.io/support/0002/")}
+        errorLog.setFocusTraversable(false); // set focus traversable false.
+    }
 }
