@@ -1,6 +1,17 @@
 # Graded-Reader-Builder
 Graded Reader Builder lets people create professional-quality graded readers from simple text input (story, vocab, characters, etc.). A wealth of high-quality books written by language learners, for language learners can be produced by this tool - and can be openly shared on an open-source graded reader database website (todo).
 
+
+## Supported language pairs:
+* L2 Mandarin (Hanzi/Hanzi(+pinyin in footers), L1 English
+* L1 English, L2 Mandarin (TESTING)
+
+## Features:
+* All vocabulary words are superscripted in the story, with the form "page.vocab number".
+* Each page with new vocabulary has left and right footers (which will split e.g. 3 words into 2 on the left, 1 on the right).
+* Vocabulary doesn't have to be ordered - the code finds the proper order for you (under development).
+* Key names are underlined in the story.
+
 #### 1. Graded Reader Builder Input & Output
 #### 2. Windows Setup Guide
 #### 3. To-do
@@ -48,14 +59,11 @@ If using a LaTeX studio (I was using TeXStudio before automating LaTeX->pdf with
 
 
 ## 3. To-do: 
-* Add image examples of key features to readme
 * Write down key features in readme
 * Check which packages I've used, and give credit where it's due
 * Add support for any language pair
 * Set up a wiki-like site where user-created content (after review, to prevent copyright infringement?) can be searched e.g. by level, length, rating, etc.
 * Set up a server that can take input (story, vocab, characters, etc.) and securely process it so that users can use this tool without having to download either the code or any required programs.
 * Set up a licence for this - likely as free as possible, as it's probable that someone can write a better implementation anyway.
-* Generalise code (if I remember correctly, I had everything named for making a Chinese graded reader for an English speaker).
 * Allow input from a github repo (story, vocab, etc.); this would allow for easy correction/modification by other language learners.
-* Move InputHeader out of input folder so it doesn't get meddled with and break things.
 **Please make requests/suggestions & report issues with the GitHub "Issue" tool, or do a Pull Request. Even if you help with something small, you can help this tool reach it's potential! Thanks!**
