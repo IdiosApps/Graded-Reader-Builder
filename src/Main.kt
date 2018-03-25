@@ -1,11 +1,10 @@
 import java.io.PrintWriter
-import java.util.*
+
+     // Process is:
+     // input    ->   tex    ->    pdf    ->    tex     ->    tex     -> pdf
+     //                                     + styling     + footers     final
 
 fun main(args: Array<String>) {
-
-    // Process is:
-    // input    ->   tex    ->    pdf    ->    tex     ->    tex     -> pdf
-    //                                     + styling     + footers     final
 
     var languageUsed = "mandarin"
 
@@ -38,13 +37,13 @@ fun main(args: Array<String>) {
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
 
     pdfNumberOfPages = PDFUtils.getNumberOfPDFPages(filenames.outputPDFFilename, pdfNumberOfPages)
-    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageLastSentences,pdfNumberOfPages)
+    PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageLastSentences, pdfNumberOfPages)
     TexUtils.getTexLineNumbers(filenames.outputStoryFilename, pdfPageLastSentences, texLinesPDFPageLastSentences, texLinesLastSentenceIndex)
 
     TeXStyling.addStyling(vocabComponentArray, filenames.outputStoryFilename, "superscript")
     TeXStyling.addStyling(keyNameComponentArray, filenames.outputStoryFilename, "underline")
 
-    FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageLastSentences, languageUsed,pdfNumberOfPages, texLinesLastSentenceIndex,pdfPageLastSentences)
+    FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageLastSentences, languageUsed, pdfNumberOfPages, texLinesLastSentenceIndex, pdfPageLastSentences)
     outputStoryTeXWriter.close()
 
     PDFUtils.xelatexToPDF(filenames.outputStoryFilename)

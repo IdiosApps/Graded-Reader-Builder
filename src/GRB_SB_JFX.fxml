@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXSnackbar?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUIController">
+  <children>
+    <!--<MenuBar VBox.vgrow="NEVER">-->
+      <!--<menus>-->
+        <!--<Menu mnemonicParsing="false" text="File">-->
+          <!--<items>-->
+            <!--<MenuItem mnemonicParsing="false" text="New" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Open…" />-->
+            <!--<Menu mnemonicParsing="false" text="Open Recent" />-->
+            <!--<SeparatorMenuItem mnemonicParsing="false" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Close" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Save" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Save As…" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Revert" />-->
+            <!--<SeparatorMenuItem mnemonicParsing="false" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Preferences…" />-->
+            <!--<SeparatorMenuItem mnemonicParsing="false" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Quit" />-->
+          <!--</items>-->
+        <!--</Menu>-->
+        <!--<Menu mnemonicParsing="false" text="Edit">-->
+          <!--<items>-->
+            <!--<MenuItem mnemonicParsing="false" text="Undo" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Redo" />-->
+            <!--<SeparatorMenuItem mnemonicParsing="false" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Cut" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Copy" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Paste" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Delete" />-->
+            <!--<SeparatorMenuItem mnemonicParsing="false" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Select All" />-->
+            <!--<MenuItem mnemonicParsing="false" text="Unselect All" />-->
+          <!--</items>-->
+        <!--</Menu>-->
+        <!--<Menu mnemonicParsing="false" text="Help">-->
+          <!--<items>-->
+            <!--<MenuItem mnemonicParsing="false" text="About MyHelloApp" />-->
+          <!--</items>-->
+        <!--</Menu>-->
+      <!--</menus>-->
+    <!--</MenuBar>-->
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <children>
+            <JFXButton fx:id="build" alignment="CENTER" buttonType="RAISED" layoutX="446.0" layoutY="306.0" onAction="#buildGR" prefHeight="49.0" prefWidth="159.0" ripplerFill="#ff8e00" text="Build">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </JFXButton>
+            <JFXComboBox fx:id="myComboBoxL1" layoutX="371.0" layoutY="29.0" onAction="#sendL2" prefHeight="25.0" prefWidth="250.0" promptText="Choose your L2 (target language)" />
+            <JFXComboBox fx:id="myComboBoxL2" layoutX="371.0" layoutY="81.0" onAction="#sendL1" prefHeight="25.0" prefWidth="250.0" promptText="Choose your L1 (native language)" />
+            <!--<JFXSnackbar layoutX="284.0" layoutY="318.0" />-->
+            <JFXTextArea editable="false" layoutX="34.0" layoutY="29.0" prefHeight="154.0" prefWidth="250.0" text="Place your input files and GRB.jar in the same folder.&#10;&#10;Inputs:&#10;- Title&#10;- Story&#10;- Vocab&#10;- Key names" />
+            <JFXTextArea fx:id="errorLog" layoutX="373.0" layoutY="183.0" prefHeight="97.0" prefWidth="250.0" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>

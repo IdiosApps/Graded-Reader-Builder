@@ -19,6 +19,7 @@ fun getNumberOfPDFPages (PDFFilename: String, pdfNumberOfPages: Int) : Int {
 
 // TODO split this into two functions: one for vocab pages, one for last sentences on pages.
 fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<String>>, pdfPageLastSentences: ArrayList<String>, pdfNumberOfPages: Int){
+    // TODO use a method similar to fixPDFPageLastLine to fix 39->8217 immediately after reading in the PDF.
     val pdfFile = File(PDFFilename)
     val documentPDF: PDDocument = PDDocument.load(pdfFile)
 
@@ -38,6 +39,10 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
                     currentVocabComponent.add(Integer.toString(pageCounter))
                 }
                 pageCounter +=1
+                if (pageCounter>pdfNumberOfPages){
+                    println("Word not found in story: " + currentVocabComponent[0])
+                    break
+                }
             }
         }
     }
@@ -85,6 +90,7 @@ fun fixPDFPageLastLine (pdfPageLastTextLine: String): String {
     // Then just scan through and remove the 0s
     // this fixes an ascii/unicode mix-up (I think).
     // this stopped appearing the same time 25,32->8217. Not sure why.
+    // TODO check if we only still have a problem of 39->8217; can maybe remove this
     var cleanedString: StringBuilder = StringBuilder()
     var characterIndexForZeroes = 0
 
