@@ -55,15 +55,4 @@ If using a LaTeX studio (I was using TeXStudio before automating LaTeX->pdf with
 * Compile with XeLaTeX (Options -> configure TeXstudio -> build tab (on left) -> default compiler: XeLaTeX)
 
 
-
-
-
-## 3. To-do: 
-* Write down key features in readme
-* Check which packages I've used, and give credit where it's due
-* Add support for any language pair
-* Set up a wiki-like site where user-created content (after review, to prevent copyright infringement?) can be searched e.g. by level, length, rating, etc.
-* Set up a server that can take input (story, vocab, characters, etc.) and securely process it so that users can use this tool without having to download either the code or any required programs.
-* Set up a licence for this - likely as free as possible, as it's probable that someone can write a better implementation anyway.
-* Allow input from a github repo (story, vocab, etc.); this would allow for easy correction/modification by other language learners.
 **Please make requests/suggestions & report issues with the GitHub "Issue" tool, or do a Pull Request. Even if you help with something small, you can help this tool reach it's potential! Thanks!**
