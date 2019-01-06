@@ -1,25 +1,11 @@
-import com.jfoenix.controls.JFXButton
-import com.jfoenix.controls.JFXComboBox
-import com.jfoenix.controls.JFXTextArea
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import javafx.scene.control.Label
-
 class GUIController {
-
-//    @FXML
-//    fun buildGR(event: ActionEvent) {
-//        info.setPromptText("Pressed build. This is errorlog.")
-//        info.setFocusTraversable(false); // set focus traversable false.
-//    System.out.println("Button Action");
-//        checkXeLaTeX()
-//        var argArray: ArrayList<String> = ArrayList<String>()
-//        Main.main(argArray)
-//    }
 
     @FXML
     fun clickedBuildButton(event: ActionEvent) {
-        println("buildButton pressed")
+        var argArray: ArrayList<String> = ArrayList<String>()
+        Main.main(argArray)
     }
 
     fun initialize() {}

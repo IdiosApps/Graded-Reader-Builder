@@ -2,7 +2,6 @@
 
 % Add the ability to display 汉字 and English
 \usepackage[UTF8]{ctex}
-\usepackage[utf8]{inputenc}
 % Add the ability to write pinyin with tones
 \usepackage{xeCJK}
 \usepackage{xpinyin}

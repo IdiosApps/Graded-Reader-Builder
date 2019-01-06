@@ -36,7 +36,7 @@ fun main(args: ArrayList<String>) {
     outputStoryTeXWriter.append("\\end{document}")
     outputStoryTeXWriter.close()
 
-    PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
+    PDFUtils.xelatexToPDF(filenames.outputStoryFilename, "ubuntu")
 
     pdfNumberOfPages = PDFUtils.getNumberOfPDFPages(filenames.outputPDFFilename, pdfNumberOfPages)
     PDFUtils.readPDF(filenames.outputPDFFilename, vocabComponentArray, pdfPageLastSentences, pdfNumberOfPages)
@@ -48,5 +48,5 @@ fun main(args: ArrayList<String>) {
     FooterUtils.addVocabFooters(vocabComponentArray, filenames.outputStoryFilename, texLinesPDFPageLastSentences, languageUsed, pdfNumberOfPages, texLinesLastSentenceIndex, pdfPageLastSentences)
     outputStoryTeXWriter.close()
 
-    PDFUtils.xelatexToPDF(filenames.outputStoryFilename)
+    PDFUtils.xelatexToPDF(filenames.outputStoryFilename, "ubuntu")
 }

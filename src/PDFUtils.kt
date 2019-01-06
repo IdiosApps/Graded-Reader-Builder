@@ -4,11 +4,22 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-fun xelatexToPDF (outputStoryFilename: String){
+fun xelatexToPDF (outputStoryFilename: String, operatingSystem:String){
+//    TODO IMPORTANT wait until pdf has been generated before continuing!
+    if (operatingSystem.contains("ubuntu")){
+        val cmdXelatexToPDF = "xelatex -output-directory=./output output/outputStory.tex"
+        Runtime.getRuntime().exec(cmdXelatexToPDF)
+        TimeUnit.SECONDS.sleep(5);
+    }
+    else if (operatingSystem.contains("windows")){
         val process = Runtime.getRuntime().exec("cmd /c start /wait buildPDF.sh")
         val exitVal = process.waitFor()
     }
+    else if (operatingSystem.contains("macos")){
+    }
+}
 
 fun getNumberOfPDFPages (PDFFilename: String, pdfNumberOfPages: Int) : Int {
     val pdfFile = File(PDFFilename)
@@ -59,10 +70,10 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
             stripper.endPage = pageCounter
             pdfPageText = stripper.getText(documentPDF)
 
-            var pdfPageTextLines: List<String> = pdfPageText.split("\r\n") //   \r   vs   \n   vs   \r\n    ..?
+            var pdfPageTextLines: List<String> = pdfPageText.split("\n")
 
-            pdfPageLastLine = fixPDFPageLastLine(pdfPageTextLines[pdfPageTextLines.size-3]) // TODO make sure this is safe. last line is page number.
-            // 2nd from last line is a blank. 3rd from last line is the last text line.
+            pdfPageLastLine = fixPDFPageLastLine(pdfPageTextLines[pdfPageTextLines.size-3])
+            // pdfPageTextLines[last] is blank, pdfPageTextLines[last-1] is page #, pdfPageTextLines[last-2] is last line of text (wanted)
             pdfPageLastSentences.add(pdfPageLastLine) // todo improve efficiency; only need 1 (of maybe 20 lines)
             pageCounter +=1
         }

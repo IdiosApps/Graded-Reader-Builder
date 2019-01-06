@@ -2,12 +2,9 @@ package TexUtils
 
 import java.io.File
 import java.io.PrintWriter
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.*
 
-fun getTexLineNumbers(outputStoryFilename: String, pdfPageLastSentences: ArrayList<String>, texLinesPDFPageLastSentences: ArrayList<Int>, texLinesLastSentenceIndex: ArrayList<Int>) {
+fun getTexLineNumbers(outputStoryFilename: String, pdfPageLastSentences: ArrayList<String>, texLinesOfPDFPagesLastSentences: ArrayList<Int>, texLineIndexOfpdfPageLastSentence: ArrayList<Int>) {
     val inputFile = File(outputStoryFilename) // get file ready
     val scan = Scanner(inputFile)
     var pdfPageLastSentenceIndexer = 0
@@ -17,8 +14,8 @@ fun getTexLineNumbers(outputStoryFilename: String, pdfPageLastSentences: ArrayLi
         var line: String = scan.nextLine()
         if (pdfPageLastSentenceIndexer<pdfPageLastSentences.size) {
             if (line.contains(pdfPageLastSentences[pdfPageLastSentenceIndexer])) {
-                texLinesPDFPageLastSentences.add(lineCount)
-                texLinesLastSentenceIndex.add(line.lastIndexOf(pdfPageLastSentences[pdfPageLastSentenceIndexer]))
+                texLinesOfPDFPagesLastSentences.add(lineCount)
+                texLineIndexOfpdfPageLastSentence.add(line.lastIndexOf(pdfPageLastSentences[pdfPageLastSentenceIndexer]))
                 pdfPageLastSentenceIndexer++
             }
             lineCount++

@@ -27,12 +27,12 @@
             </Label>
             <Separator layoutX="320.0" layoutY="-2.0" opacity="0.68" orientation="VERTICAL" prefHeight="400.0" prefWidth="0.0" />
             <Separator layoutX="319.0" layoutY="44.0" opacity="0.18" prefHeight="0.0" prefWidth="319.0" />
-            <JFXButton alignment="CENTER" buttonType="RAISED" layoutX="578.0" prefHeight="44.0" prefWidth="62.0" ripplerFill="#b51414" text="Close" textFill="WHITE">
+            <JFXButton alignment="CENTER" buttonType="RAISED" layoutX="578.0" prefHeight="44.0" prefWidth="100.0" ripplerFill="#b51414" text="Close" textFill="WHITE">
                <font>
                   <Font name="Noto Sans Regular" size="24.0" />
                </font>
             </JFXButton>
-            <JFXButton alignment="CENTER" buttonType="RAISED" layoutX="508.0" prefHeight="44.0" prefWidth="62.0" ripplerFill="#b51414" text="Min" textFill="WHITE">
+            <JFXButton alignment="CENTER" buttonType="RAISED" layoutX="508.0" prefHeight="44.0" prefWidth="80.0" ripplerFill="#b51414" text="Min" textFill="WHITE">
                <font>
                   <Font name="Noto Sans Regular" size="24.0" />
                </font>
