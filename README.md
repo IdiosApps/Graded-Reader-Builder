@@ -1,5 +1,5 @@
 # Graded-Reader-Builder
-Graded Reader Builder lets people create professional-quality graded readers from simple text input (story, vocab, characters, etc.). A wealth of high-quality books written by language learners, for language learners can be produced by this tool - and can be openly shared on an open-source graded reader database website (todo).
+Graded Reader Builder lets people create professional-quality graded readers from simple text input (story, vocab, characters, etc.). A wealth of high-quality books written by language learners, for language learners can be produced by this tool!
 
 ###### 1. Graded Reader Builder Input & Output
 ###### 2. Features
