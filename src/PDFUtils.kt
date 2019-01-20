@@ -6,15 +6,16 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-fun xelatexToPDF (outputStoryFilename: String, operatingSystem:String){
+fun xelatexToPDF (outputStoryFilename: String) {
 //    TODO IMPORTANT wait until pdf has been generated before continuing!
+    val operatingSystem = OSUtils.getOS()
     if (operatingSystem.contains("ubuntu")){
         val cmdXelatexToPDF = "xelatex -output-directory=./output output/outputStory.tex"
         Runtime.getRuntime().exec(cmdXelatexToPDF)
         TimeUnit.SECONDS.sleep(5);
     }
     else if (operatingSystem.contains("windows")){
-        val process = Runtime.getRuntime().exec("cmd /c start /wait buildPDF.sh")
+        val process = Runtime.getRuntime().exec("cmd /c start /wait buildPDF.bat")
         val exitVal = process.waitFor()
     }
     else if (operatingSystem.contains("macos")){
@@ -70,7 +71,7 @@ fun readPDF (PDFFilename: String, vocabComponentArray: ArrayList<ArrayList<Strin
             stripper.endPage = pageCounter
             pdfPageText = stripper.getText(documentPDF)
 
-            var pdfPageTextLines: List<String> = pdfPageText.split("\n")
+            var pdfPageTextLines: List<String> = pdfPageText.split("\r\n")
 
             pdfPageLastLine = fixPDFPageLastLine(pdfPageTextLines[pdfPageTextLines.size-3])
             // pdfPageTextLines[last] is blank, pdfPageTextLines[last-1] is page #, pdfPageTextLines[last-2] is last line of text (wanted)

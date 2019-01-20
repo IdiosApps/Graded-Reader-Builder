@@ -1,1 +1,0 @@
- cd output && xelatex outputStory.tex
