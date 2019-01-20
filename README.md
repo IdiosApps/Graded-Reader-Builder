@@ -57,6 +57,8 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
 12. Code will run, and in a command window (bash) xelatex will get the required packages/files. This could take quite a few minutes.
 
+Updating packages from the MiKTeX console and restarting might help too. I could run my .sh/.bat manually from Windows, but executing this file from IDEA made the terminal close instantly until I did this.
+
 If using a LaTeX studio (I was using TeXStudio before automating LaTeX->pdf with miktex(/xelatex), then you may need to: 
 * Install packages (mostly for CJK/pinyin)
 * Compile with XeLaTeX (Options -> configure TeXstudio -> build tab (on left) -> default compiler: XeLaTeX)
