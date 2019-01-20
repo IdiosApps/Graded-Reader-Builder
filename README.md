@@ -25,7 +25,7 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 * Key names are underlined in the story.
 
 
-## 3. Windows Setup Guide
+## 3. Setup Guide (for Windows - fairly similar for Ubuntu and presumably Mac)
 ###### This should be defunct when a GUI/installer is made
 1. Make a Github account and fork this project (to make your own local version). This seems to be the easiest way to get it running on your PC late on.
 
@@ -37,7 +37,7 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
 5. In IDEA, click on Graded-Reader-Builder/src/main.kt (at the top left). IDEA will say "Project SDK not defined", so you need to get the java SDK.
 
-6. Get the latest [Java jdk - here is jdk9](http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html). Install. Point IDEA to the install folder (C:\Progam Files\Java\jdk-9.0.4 for me)
+6. Get the latest [Java jdk - here is jdk11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). Install. Point IDEA to the install folder (C:\Progam Files\Java\jdk-9.0.4 for me)
 
 7. Wait for IDEA to index. It'll probably ask to update Kotlin.
 
@@ -47,7 +47,13 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
 10. In the "res" folder, replace the input file contents with your content (following the example format).
 
-11. At the top of IDEA, press "Run", then "run", then choose "Main.kt"
+11. At the top of IDEA, press "Run", then "edit configurations". 
+* Hit plus, then "Kotlin"
+* Main class: MainGUIKt
+* VM options: --module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml,javafx.graphics,javafx.base
+* JRE: 11 
+
+
 
 12. Code will run, and in a command window (bash) xelatex will get the required packages/files. This could take quite a few minutes.
 
