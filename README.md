@@ -43,11 +43,13 @@ The example pdf is available [here](../examples/ExampleGradedReader.pdf)
 
 8. Hit File -> Project Structure -> Project Settings -> Libraries -> Add JARs, and choose the libs folder at "C:\Users\YourUsername\IdeaProjects\Graded-Reader-Builder\libs".
 
-9. In the "res" folder, replace the input file contents with your content (following the example format).
+9. Set your [path variables for JavaFX](https://openjfx.io/openjfx-docs/#install-javafx) for your OS, and in IDEA/File/Settings/Appearance and Behaviour/Path Variables/Path variables
 
-10. At the top of IDEA, press "Run", then "run", then choose "Main.kt"
+10. In the "res" folder, replace the input file contents with your content (following the example format).
 
-11. Code will run, and in a command window (bash) xelatex will get the required packages/files. This could take quite a few minutes.
+11. At the top of IDEA, press "Run", then "run", then choose "Main.kt"
+
+12. Code will run, and in a command window (bash) xelatex will get the required packages/files. This could take quite a few minutes.
 
 If using a LaTeX studio (I was using TeXStudio before automating LaTeX->pdf with miktex(/xelatex), then you may need to: 
 * Install packages (mostly for CJK/pinyin)
